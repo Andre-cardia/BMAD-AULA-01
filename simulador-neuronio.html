@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulador de Neurônio Artificial — Vai ter Churrasco?</title>
+<title>Simulador de Neurônio Artificial</title>
 <style>
   :root {
     --bg: #0d1220;
@@ -33,9 +33,44 @@
     line-height: 1.4;
   }
 
-  h1 { margin: 0 0 2px; font-size: 22px; letter-spacing: -0.3px; }
+  h1 { margin: 0; font-size: 20px; letter-spacing: -0.3px; white-space: nowrap; }
 
-  .sub { margin: 0 0 10px; color: var(--txt-dim); font-size: 14.5px; max-width: 1000px; }
+  .sub { margin: 0 0 8px; color: var(--txt-dim); font-size: 14.5px; max-width: 1240px; }
+
+  /* ---------- Abas de Nível (FR-9): estilo de aba, distinto dos Cenários ---------- */
+
+  .appbar {
+    display: flex; align-items: flex-end; gap: 22px;
+    border-bottom: 2px solid var(--line);
+    margin: 0 0 10px;
+  }
+
+  .appbar h1 { padding-bottom: 8px; }
+
+  .levels { display: flex; gap: 4px; }
+
+  .levels button {
+    font: inherit; font-weight: 700; font-size: 16px;
+    color: var(--txt-dim);
+    background: transparent;
+    border: 2px solid transparent;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 7px 18px 8px;
+    margin-bottom: -2px;
+    cursor: pointer;
+  }
+
+  .levels button:hover { color: var(--txt); }
+
+  .levels button[aria-selected="true"] {
+    color: var(--txt);
+    background: var(--panel-solid);
+    border-color: var(--line);
+    box-shadow: inset 0 3px 0 var(--on);
+  }
+
+  [hidden] { display: none !important; }
 
   .sr-only {
     position: absolute; width: 1px; height: 1px;
@@ -47,7 +82,7 @@
 
   /* ---------- Cenários (FR-1) ---------- */
 
-  .topbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .topbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
 
   .scenarios { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -89,9 +124,9 @@
     padding: 4px 8px 0;
   }
 
-  #net { display: block; width: 100%; height: auto; }
+  #n1-net { display: block; width: 100%; height: 390px; }
 
-  #net text { font-family: inherit; }
+  #n1-net text { font-family: inherit; }
 
   .node-hit { cursor: pointer; }
   .node-hit:hover .node-ring { stroke: #fff; }
@@ -100,7 +135,7 @@
 
   .mathbar {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    margin-top: 10px; padding: 10px 14px;
+    margin-top: 8px; padding: 8px 14px;
     background: var(--panel-solid);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -175,11 +210,139 @@
     border: 2px solid var(--warn); border-radius: 12px;
     background: #2a2210; color: var(--txt); font-size: 16px;
   }
+
+  /* ================= Nível 2 (nenhum texto abaixo de 14 px) ================= */
+
+  #nivel2 { font-size: 14px; }
+  #nivel2 h2 { margin: 0 0 4px; font-size: 17px; }
+  #nivel2 h3 { margin: 8px 0 2px; font-size: 15px; }
+  #nivel2 p { margin: 0 0 6px; }
+  .n2-dim { color: var(--txt-dim); font-weight: 400; font-size: 14px; }
+  .n2-apoio { color: var(--txt-dim); font-size: 14px; line-height: 1.35; }
+  .n2-apoio b { color: var(--txt); }
+  .n2-azul { color: var(--accent); font-weight: 700; }
+  .n2-verm { color: var(--neg); font-weight: 700; }
+
+  .n2-btn {
+    font: inherit; font-weight: 600; font-size: 15px;
+    color: var(--txt); background: var(--panel-2);
+    border: 2px solid var(--line); border-radius: 8px;
+    padding: 5px 13px; cursor: pointer;
+  }
+  .n2-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .n2-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .n2-primario { background: var(--on); border-color: var(--on); color: #05210f; }
+  .n2-primario:hover:not(:disabled) { border-color: #fff; }
+  .n2-leve { font-size: 14px; color: var(--txt-dim); background: transparent; }
+
+  .n2-player {
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap;
+    padding: 6px 10px; margin-bottom: 8px;
+    background: var(--panel-solid); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .n2-contador {
+    font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums;
+    margin-left: 6px; display: flex; gap: 10px; align-items: baseline;
+  }
+  .n2-estado { font-size: 14px; font-weight: 600; color: var(--warn); }
+  .n2-sementes { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .n2-semente-txt { color: var(--txt-dim); font-size: 14px; }
+
+  .n2-col {
+    background: var(--panel-solid); border: 1px solid var(--line);
+    border-radius: 12px; padding: 8px 12px;
+  }
+
+  .n2-meio {
+    display: grid; grid-template-columns: 350px 454px 1fr; gap: 8px;
+    height: 508px;
+  }
+  .n2-meio .n2-col { min-height: 0; overflow-y: auto; }
+  .n2-rede svg, .n2-aprendizado svg { display: block; }
+  #n2-net text, #n2-graf-erro text, #n2-graf-ac text { font-family: inherit; }
+
+  .n2-resumo { font-weight: 700; margin: 2px 0 4px; min-height: 19px; }
+  .n2-grade { display: grid; grid-template-columns: repeat(7, 42px); gap: 4px; }
+  .n2-mini {
+    position: relative; width: 42px; padding: 2px 0 0;
+    background: var(--panel-2); border: 2px solid var(--line); border-radius: 6px;
+    color: var(--txt-dim); font: inherit; font-size: 14px; line-height: 16px;
+    text-align: center; cursor: default;
+  }
+  button.n2-mini { cursor: pointer; }
+  button.n2-mini:hover { border-color: var(--accent); }
+  .n2-mini canvas { display: block; width: 32px; height: 32px; margin: 0 auto; background: #fff; border-radius: 2px; }
+  .n2-mini.amb { border-style: dashed; border-color: var(--warn); }
+  .n2-mini.ok { border-color: var(--on); border-style: solid; }
+  .n2-mini.erro { border-color: var(--neg); border-style: solid; background: #3a1d22; }
+  .n2-mini.amb.ok, .n2-mini.amb.erro { border-style: dashed; }
+  .n2-mini.sel { outline: 3px solid #fff; outline-offset: 1px; }
+  .n2-marca {
+    position: absolute; top: -7px; right: -6px; width: 18px; height: 18px;
+    border-radius: 50%; font-size: 14px; line-height: 18px; font-weight: 800; color: #06121f;
+  }
+  .n2-mini.ok .n2-marca { background: var(--on); }
+  .n2-mini.erro .n2-marca { background: var(--neg); }
+
+  .n2-ligacao { border-left: 3px solid var(--on); padding-left: 8px; }
+
+  .n2-legenda { display: flex; gap: 8px; align-items: center; color: var(--txt-dim); margin: 0 0 2px; }
+  .n2-leg-treino, .n2-leg-teste { display: inline-block; width: 26px; height: 0; border-top: 3px solid var(--accent); }
+  .n2-leg-teste { border-top: 3px dashed var(--warn); margin-left: 10px; }
+  .n2-num { font-variant-numeric: tabular-nums; font-size: 15px; margin: 2px 0 2px !important; }
+  .n2-num b { font-weight: 800; }
+  .n2-aviso-of {
+    margin-top: 8px; padding: 8px 10px; border: 2px solid var(--warn);
+    border-radius: 10px; background: #2a2210; font-size: 14px;
+  }
+
+  .n2-baixo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+  .n2-hp { display: grid; grid-template-columns: 230px 1fr; gap: 2px 14px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .n2-hp:first-child { border-top: none; }
+  .n2-hp-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
+  .n2-hp-val { color: var(--accent); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .n2-hp .ticks { font-size: 14px; }
+  .n2-hp input[type="range"]:disabled { opacity: .45; }
+  .n2-hp .n2-apoio { margin: 0; }
+  .n2-aviso-hp { color: var(--warn); font-weight: 600; }
+
+  .n2-cl-corpo { display: flex; gap: 14px; align-items: flex-start; }
+  #n2-grande { width: 200px; height: 200px; background: #fff; border-radius: 8px; image-rendering: pixelated; flex: none; }
+  .n2-cl-info { flex: 1; min-width: 0; }
+  .n2-cl-origem { color: var(--txt-dim); }
+  .n2-cl-resposta { font-size: 28px; font-weight: 800; margin: 2px 0 6px !important; }
+  .n2-barra { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 8px; }
+  .n2-barra-trilho {
+    position: relative; flex: 1; height: 16px; border-radius: 8px;
+    background: linear-gradient(90deg, var(--neg), #3a4560 50%, var(--accent));
+  }
+  .n2-barra-meio { position: absolute; left: 50%; top: -4px; bottom: -4px; border-left: 2px dashed #fff; opacity: .6; }
+  .n2-barra-marca {
+    position: absolute; top: -6px; width: 8px; height: 28px; margin-left: -4px;
+    background: #fff; border-radius: 4px; box-shadow: 0 0 6px #000; left: 50%;
+  }
+  .n2-cl-verdade { font-weight: 700; }
+
+  .n2-licoes {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;
+    border-top: 1px solid var(--line); padding-top: 6px; color: var(--txt-dim);
+  }
+  .n2-licoes h3 { color: var(--txt); }
+  .n2-atalhos { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
 
-<h1>🧠 Simulador de Neurônio Artificial</h1>
+<header class="appbar">
+  <h1>🧠 Simulador de Neurônio Artificial</h1>
+  <div class="levels" role="tablist" aria-label="Níveis do simulador">
+    <button type="button" role="tab" id="tab-n1" aria-controls="nivel1" aria-selected="true">Nível 1: o neurônio</button>
+    <button type="button" role="tab" id="tab-n2" aria-controls="nivel2" aria-selected="false" tabindex="-1">Nível 2: o treinamento</button>
+  </div>
+</header>
+
+<section id="nivel1" role="tabpanel" aria-labelledby="tab-n1">
 <p class="sub">
   <b>Clique nos círculos da esquerda</b> para ligar ou desligar cada entrada e veja o sinal viajar pelas conexões
   até o neurônio. Ele soma tudo (a <b>Soma Ponderada</b>), entrega o total para a <b>função de ativação</b> e,
@@ -204,8 +367,8 @@
 
 <!-- O diagrama: entradas → conexões → corpo do neurônio → função de ativação → saída -->
 <div class="stage">
-  <svg id="net" viewBox="0 0 1040 470" role="img" aria-labelledby="net-desc"></svg>
-  <p class="sr-only" id="net-desc"></p>
+  <svg id="n1-net" viewBox="0 8 1040 452" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="n1-net-desc"></svg>
+  <p class="sr-only" id="n1-net-desc"></p>
 </div>
 
 <!-- FR-5: a conta com os números reais -->
@@ -225,6 +388,132 @@
   milhares deles ficam ligados uns nos outros, e os pesos não são ajustados à mão:
   são <b>aprendidos</b> a partir de exemplos.
 </p>
+</section>
+
+<section id="nivel2" role="tabpanel" aria-labelledby="tab-n2" hidden>
+
+<!-- Topo: barra de player (FR-14) -->
+<div class="n2-player" role="group" aria-label="Controles do Treinamento">
+  <button type="button" id="n2-treinar" class="n2-btn n2-primario">▶ Treinar</button>
+  <button type="button" id="n2-pausar" class="n2-btn">⏸ Pausar</button>
+  <button type="button" id="n2-passo" class="n2-btn">+1 Época</button>
+  <button type="button" id="n2-reiniciar" class="n2-btn">↺ Reiniciar</button>
+  <span class="n2-contador"><span id="n2-contador">Época 0 de 30</span><span id="n2-estado" class="n2-estado"></span></span>
+  <span class="n2-sementes">
+    <span id="n2-semente" class="n2-semente-txt"></span>
+    <button type="button" id="n2-sortear" class="n2-btn n2-leve">🎲 Sortear outra rede</button>
+    <button type="button" id="n2-padrao" class="n2-btn n2-leve">Voltar à Semente padrão</button>
+  </span>
+</div>
+
+<!-- Faixa do meio: Exemplos | A Rede | O aprendizado -->
+<div class="n2-meio">
+
+  <div class="n2-col n2-exemplos" aria-labelledby="n2-tit-ex">
+    <h2 id="n2-tit-ex">Exemplos</h2>
+    <p class="n2-apoio">Cada <b>Exemplo</b> é um Desenho com a resposta certa, o <b>Rótulo</b> ("cão" ou "gato").
+      A rede aprende só com eles.</p>
+    <h3>Conjunto de Teste <span class="n2-dim">· 60, a rede nunca usa para aprender</span></h3>
+    <p class="n2-apoio">Serve para medir o desempenho em Desenhos que a rede nunca viu.
+      Clique num deles para a rede classificar.</p>
+    <div id="n2-resumo-teste" class="n2-resumo"></div>
+    <div id="n2-grade-teste"></div>
+    <h3>Conjunto de Treino <span class="n2-dim">· 180, a rede vê os Rótulos</span></h3>
+    <p class="n2-apoio">A rede olha estes Exemplos e os Rótulos deles a cada Época, e corrige os Pesos.</p>
+    <div id="n2-grade-treino"></div>
+    <p class="n2-apoio">Borda tracejada = <b>Desenho Ambíguo</b>: traços no meio do caminho entre cão e gato.
+      Até uma pessoa hesitaria.</p>
+  </div>
+
+  <div class="n2-col n2-rede" aria-labelledby="n2-tit-rede">
+    <h2 id="n2-tit-rede">A Rede</h2>
+    <p class="n2-apoio n2-ligacao">Cada neurônio aqui faz <b>a mesma conta do Nível 1</b> (a Soma Ponderada).
+      A diferença: a Função de Ativação é a <b>sigmoide</b>, e quem escolhe os Pesos é a própria rede.</p>
+    <svg id="n2-net" width="430" height="330" viewBox="0 0 430 330" role="img" aria-labelledby="n2-net-desc"></svg>
+    <p class="sr-only" id="n2-net-desc"></p>
+    <p class="n2-apoio">Cada quadrado é o <b>mapa de Pesos</b> de um neurônio da <b>Camada Oculta</b>
+      (hidden layer): quanto cada Peso mudou desde o início do Treinamento.
+      <span class="n2-azul">Azul</span> empurra para "gato", <span class="n2-verm">vermelho</span> para "cão".
+      Antes de treinar, os mapas estão neutros.</p>
+    <p class="n2-apoio">A cada lote de Exemplos, a rede compara suas respostas com os Rótulos e faz a
+      <b>Correção dos Pesos</b>, de trás para frente: do Neurônio de Saída até os pixels. As linhas até a saída
+      mostram o Peso de cada neurônio: espessura = força, azul = positivo, vermelho = negativo.</p>
+  </div>
+
+  <div class="n2-col n2-aprendizado" aria-labelledby="n2-tit-apr">
+    <h2 id="n2-tit-apr">O aprendizado</h2>
+    <p class="n2-legenda"><span class="n2-leg-treino"></span>treino <span class="n2-leg-teste"></span>teste</p>
+    <h3>Erro (loss) <span class="n2-dim">· quanto menor, melhor</span></h3>
+    <svg id="n2-graf-erro" width="430" height="128" viewBox="0 0 430 128" role="img" aria-label="Curvas de Erro no treino e no teste"></svg>
+    <p class="n2-num" id="n2-num-erro"></p>
+    <h3>Acurácia (accuracy) <span class="n2-dim">· % de Classificações Corretas</span></h3>
+    <svg id="n2-graf-ac" width="430" height="110" viewBox="0 0 430 110" role="img" aria-label="Curvas de Acurácia no treino e no teste"></svg>
+    <p class="n2-num" id="n2-num-ac"></p>
+    <div id="n2-aviso-of" class="n2-aviso-of" role="status" hidden></div>
+    <p class="n2-apoio">O <b>Erro</b> mede o quanto as respostas da rede estão longe dos Rótulos, e pesa mais
+      quando ela erra com muita certeza. A <b>Acurácia</b> conta só se acertou ou não. As duas são medidas no treino
+      e no teste; a linha "chute" é o Erro de quem responde 50% para tudo.</p>
+  </div>
+
+</div>
+
+<!-- Faixa de baixo: Hiperparâmetros | Classificação -->
+<div class="n2-baixo">
+
+  <div class="n2-col n2-hiper" aria-labelledby="n2-tit-hp">
+    <h2 id="n2-tit-hp">Hiperparâmetros <span class="n2-dim">· escolhas suas, que a rede não aprende sozinha</span></h2>
+    <div id="n2-controles"></div>
+    <p class="n2-apoio" id="n2-regra-hp">Durante o Treinamento só as Épocas podem mudar. Depois de concluído,
+      mudar Learning Rate, Batch Size ou Camada Oculta recomeça o Treinamento do zero.</p>
+    <p class="n2-aviso-hp" id="n2-aviso-hp" role="status" hidden></p>
+  </div>
+
+  <div class="n2-col n2-classif" aria-labelledby="n2-tit-cl">
+    <h2 id="n2-tit-cl">Classificação</h2>
+    <div class="n2-cl-corpo">
+      <canvas id="n2-grande" width="20" height="20" aria-hidden="true"></canvas>
+      <div class="n2-cl-info">
+        <p class="n2-cl-origem" id="n2-cl-origem"></p>
+        <p class="n2-cl-resposta" id="n2-cl-resposta" aria-live="polite"></p>
+        <div class="n2-barra" aria-hidden="true">
+          <span class="n2-barra-cao">🐶 cão</span>
+          <div class="n2-barra-trilho"><div class="n2-barra-meio"></div><div class="n2-barra-marca" id="n2-barra-marca"></div></div>
+          <span class="n2-barra-gato">gato 🐱</span>
+        </div>
+        <p class="n2-cl-verdade" id="n2-cl-verdade"></p>
+        <p class="n2-apoio" id="n2-cl-duvida"></p>
+        <button type="button" id="n2-novo" class="n2-btn n2-primario">✏️ Gerar Desenho Novo</button>
+      </div>
+    </div>
+    <p class="n2-apoio">A <b>Probabilidade</b> é a chance de ser gato que a rede calcula; a chance de ser cão é o
+      que falta para 100%. A <b>Confiança</b> é a chance da classe que ela escolheu: 50% é chute, 100% é certeza.
+      Um Desenho Novo é gerado agora e não está em nenhum Conjunto.</p>
+  </div>
+
+</div>
+
+<!-- Apoio didático: equívocos (FR-18) -->
+<div class="n2-licoes">
+  <div>
+    <h3>Overfitting</h3>
+    <p>A rede "decora" os Exemplos de treino em vez de aprender o padrão geral. Sinal: o Erro no treino continua
+      caindo enquanto o Erro no teste para de cair e volta a subir. Por isso a Acurácia no treino não é o
+      desempenho real — pergunte sempre pela Acurácia no teste.</p>
+  </div>
+  <div>
+    <h3>"Mais" nem sempre é melhor</h3>
+    <p>Mais Épocas podem levar ao Overfitting. Learning Rate maior não aprende mais rápido: passa do ponto.
+      Mais neurônios na Camada Oculta não garantem acerto maior.</p>
+  </div>
+  <div>
+    <h3>Desenhos não são fotos</h3>
+    <p>Estes Desenhos são simples de propósito. Fotos reais exigem redes muito maiores e muito mais Exemplos —
+      e a rede continua sem "entender" o que é um gato: ela só aprendeu quais pixels pesam mais.</p>
+  </div>
+  <p class="n2-atalhos">Atalhos deste Nível: <b>Espaço</b> treina ou pausa · <b>→</b> avança uma Época.</p>
+</div>
+
+</section>
 
 <script>
 "use strict";
@@ -276,11 +565,14 @@ var SVGNS = "http://www.w3.org/2000/svg";
 var semAnimacao = window.matchMedia &&
                   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* Número em formato brasileiro: 3 -> "3", 1.5 -> "1,5" */
-function fmt(n) {
-  var r = Math.round(n * 10) / 10;
+/* Número em formato brasileiro: 3 -> "3", 1.5 -> "1,5".
+   casas: máximo de casas decimais (padrão 1, o do Nível 1). */
+function fmt(n, casas) {
+  var c = casas === undefined ? 1 : casas;
+  var f = Math.pow(10, c);
+  var r = Math.round(n * f) / f;
   if (r === 0) r = 0;
-  return r.toString().replace(".", ",");
+  return (c > 1 ? r.toFixed(c).replace(/\.?0+$/, "") : r.toString()).replace(".", ",");
 }
 
 /* ================= Geometria do diagrama ================= */
@@ -335,14 +627,14 @@ function aresta(ax, ay, ar, bx, by, br) {
 var refs = null;  // elementos que mudam a cada quadro
 
 function construirDiagrama() {
-  var svg = document.getElementById("net");
+  var svg = document.getElementById("n1-net");
   svg.innerHTML = "";
 
   refs = { entradas: [], pulsos: [] };
 
   /* --- filtros de brilho --- */
   var defs = el("defs", {}, svg);
-  [["glowOn", "#22c55e", "7"], ["glowAccent", "#5aa9ff", "5"]].forEach(function (g) {
+  [["n1-glowOn", "#22c55e", "7"], ["n1-glowAccent", "#5aa9ff", "5"]].forEach(function (g) {
     var f = el("filter", { id: g[0], x: "-60%", y: "-60%", width: "220%", height: "220%" }, defs);
     el("feDropShadow", {
       dx: 0, dy: 0, stdDeviation: g[2], "flood-color": g[1], "flood-opacity": "0.85"
@@ -788,7 +1080,7 @@ function pintarDiagrama(contribs, soma, ativado) {
 
     r.anel.setAttribute("stroke", e.ligada ? "var(--on)" : "var(--off)");
     r.anel.setAttribute("fill", e.ligada ? "var(--on-soft)" : "var(--off-soft)");
-    r.anel.setAttribute("filter", e.ligada ? "url(#glowOn)" : "none");
+    r.anel.setAttribute("filter", e.ligada ? "url(#n1-glowOn)" : "none");
 
     r.valor.textContent = e.ligada ? "1" : "0";
     r.valor.setAttribute("fill", e.ligada ? "#6ee7a0" : "var(--off)");
@@ -809,14 +1101,14 @@ function pintarDiagrama(contribs, soma, ativado) {
   refs.arco.setAttribute("stroke-dasharray", (prog * refs.circunf) + " " + refs.circunf);
   refs.arco.setAttribute("stroke", corFogo);
 
-  refs.neuronioGlow.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+  refs.neuronioGlow.setAttribute("filter", ativado ? "url(#n1-glowOn)" : "none");
   if (semAnimacao) refs.neuronioGlow.setAttribute("opacity", ativado ? 1 : 0);
 
   /* ponto no degrau da função de ativação */
   refs.ponto.setAttribute("cx", refs.px(soma));
   refs.ponto.setAttribute("cy", ativado ? refs.gy1 : refs.gy0);
   refs.ponto.setAttribute("fill", ativado ? "var(--on)" : "var(--off)");
-  refs.ponto.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+  refs.ponto.setAttribute("filter", ativado ? "url(#n1-glowOn)" : "none");
 
   refs.setaFn.setAttribute("stroke", ativado ? "var(--on)" : "var(--line)");
 
@@ -827,7 +1119,7 @@ function pintarDiagrama(contribs, soma, ativado) {
 
   refs.outAnel.setAttribute("stroke", ativado ? "var(--on)" : "var(--off)");
   refs.outAnel.setAttribute("stroke-width", ativado ? 4 : 3);
-  refs.outAnel.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+  refs.outAnel.setAttribute("filter", ativado ? "url(#n1-glowOn)" : "none");
   refs.outGlow.setAttribute("opacity", ativado ? 1 : 0);
 
   refs.outEmoji.textContent = txt.emoji;
@@ -838,7 +1130,7 @@ function pintarDiagrama(contribs, soma, ativado) {
   refs.outMsg.setAttribute("fill", ativado ? "#6ee7a0" : "var(--off)");
 
   /* descrição textual do diagrama para leitores de tela */
-  document.getElementById("net-desc").textContent =
+  document.getElementById("n1-net-desc").textContent =
     "Diagrama do neurônio. " +
     contribs.map(function (c) {
       return c.nome + " " + (c.x ? "ligada" : "desligada") +
@@ -916,6 +1208,17 @@ function animar(ts) {
   refs.neuronioGlow.setAttribute(
     "opacity", ativadoAtual ? (0.55 + 0.45 * Math.abs(Math.sin(t * 1.9))) : 0);
 
+  /* FR-9: o loop do Nível 1 só roda com a aba dele ativa */
+  if (nivelAtivo !== 1) { n1Animando = false; return; }
+  requestAnimationFrame(animar);
+}
+
+var nivelAtivo = 1;
+var n1Animando = false;
+
+function iniciarAnimacaoN1() {
+  if (semAnimacao || n1Animando) return;
+  n1Animando = true;
   requestAnimationFrame(animar);
 }
 
@@ -935,7 +1238,7 @@ montarControles();
 recalcular();
 
 if (!semAnimacao) {
-  requestAnimationFrame(animar);
+  iniciarAnimacaoN1();
 } else {
   /* sem animação: um sinal estático no meio de cada conexão ligada */
   refs.pulsos.forEach(function (p, i) {
@@ -947,6 +1250,1044 @@ if (!semAnimacao) {
     });
   });
 }
+</script>
+
+<script id="n2-core">
+/* ==================================================================
+   Nível 2 — núcleo puro (sem DOM). Uma só fonte de lógica para a
+   página e para ferramentas/calibracao-nivel2.mjs.
+================================================================== */
+(function (root) {
+  "use strict";
+
+  var LADO = 20, NPIX = LADO * LADO;
+  var CLAMP = 1e-7;
+
+  var CFG = {
+    sementePadrao: 2026,
+    nExemplos: 240, nTreino: 180, nTeste: 60, fracaoAmbiguos: 0.10,
+    epocasPadrao: 30, lrPadrao: 0.5, batchPadrao: 20, ocultosPadrao: 4,
+    LR_VALORES: [0.01, 0.05, 0.1, 0.5, 1, 3, 10],
+    BATCH_VALORES: [1, 10, 20, 45, 180],
+    EPOCAS_MIN: 1, EPOCAS_MAX: 200, OCULTOS_MIN: 1, OCULTOS_MAX: 8,
+    // geração dos Desenhos
+    desloc: 2, escalaMin: 0.85, escalaMax: 1.15, raio: 5,
+    ruido: 0.10,
+    orelhaNormal: 0.15, focinhoNormal: 0.25,
+    ambigOrelha: 0.06, ambigFocinho: 0.12,
+    // inicialização
+    initOculta: 0.01, initSaidaMin: 0.3, initSaidaMax: 0.5,
+    // mapa de Pesos: |mudança| que satura a cor
+    escalaMapa: 0.5,
+    // Overfitting (FR-18)
+    ofTeste: 1.10, ofTreino: 1.05, ofSeguidas: 5,
+    // ritmo do player (FR-14): intervalo entre atualizações da tela
+    intervaloMs: 333
+  };
+
+  /* ---------------- PRNG com semente ---------------- */
+
+  function mulberry32(a) {
+    a = a >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  var FLUXOS = { dados: 1, inicializacao: 2, embaralhamento: 3, novos: 4 };
+
+  /* Semente derivada por fluxo: cada fluxo tem sua própria sequência. */
+  function derivarSemente(semente, fluxo) {
+    var k = typeof fluxo === "number" ? fluxo : FLUXOS[fluxo];
+    var r = mulberry32((semente ^ Math.imul(k, 0x9E3779B9)) >>> 0);
+    r(); r();
+    return Math.floor(r() * 4294967296) >>> 0;
+  }
+
+  function fluxo(semente, nome) { return mulberry32(derivarSemente(semente, nome)); }
+
+  function unif(rng, a, b) { return a + (b - a) * rng(); }
+
+  function gauss(rng) {
+    var u = 1 - rng(), v = rng();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  function embaralhar(arr, rng) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  /* ---------------- Geometria dos Desenhos ---------------- */
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function distSeg(px, py, ax, ay, bx, by) {
+    var dx = bx - ax, dy = by - ay;
+    var l2 = dx * dx + dy * dy;
+    var t = l2 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    var qx = ax + t * dx - px, qy = ay + t * dy - py;
+    return Math.sqrt(qx * qx + qy * qy);
+  }
+
+  function noTriangulo(px, py, a, b, c) {
+    function s(p1, p2) { return (px - p2[0]) * (p1[1] - p2[1]) - (p1[0] - p2[0]) * (py - p2[1]); }
+    var d1 = s(a, b), d2 = s(b, c), d3 = s(c, a);
+    var neg = d1 < 0 || d2 < 0 || d3 < 0, pos = d1 > 0 || d2 > 0 || d3 > 0;
+    return !(neg && pos);
+  }
+
+  /* Primitivas de um Desenho a partir dos parâmetros.
+     orelha: 0 = gato (pontuda, para cima) … 1 = cão (caída, na lateral).
+     focinho: 0 = gato (nariz pequeno e bigodes) … 1 = cão (focinho longo, nariz grande). */
+  function primitivas(p, partes) {
+    var cx = p.cx, cy = p.cy, r = p.r, e = p.orelha, m = p.focinho, t = p.traco;
+    var lista = [];
+    var quer = function (n) { return !partes || partes.indexOf(n) >= 0; };
+
+    if (quer("cabeca")) {
+      lista.push({ tipo: "anel", cx: cx, cy: cy, r: r, w: t, v: 1 });
+      // olhos
+      lista.push({ tipo: "elipse", cx: cx - r * 0.42, cy: cy - r * 0.18, rx: 0.75, ry: 0.75, v: 1 });
+      lista.push({ tipo: "elipse", cx: cx + r * 0.42, cy: cy - r * 0.18, rx: 0.75, ry: 0.75, v: 1 });
+    }
+    if (quer("orelha")) {
+      [-1, 1].forEach(function (s) {
+        var A = [cx + s * r * 0.30, cy - r * 0.96];
+        var B = [cx + s * r * 0.92, cy - r * 0.40];
+        var tipGato = [cx + s * r * 0.80, cy - r - 3.6];
+        var tipCao  = [cx + s * (r + 2.4), cy + r * 0.55];
+        var tip = [lerp(tipGato[0], tipCao[0], e), lerp(tipGato[1], tipCao[1], e)];
+        lista.push({ tipo: "tri", a: A, b: B, c: tip, v: 1 });
+      });
+    }
+    if (quer("focinho")) {
+      // bigodes (gato) somem conforme o focinho vira de cão
+      var vb = 0.85 * (1 - m);
+      if (vb > 0.02) {
+        [-1, 1].forEach(function (s) {
+          for (var k = -1; k <= 1; k++) {
+            lista.push({
+              tipo: "seg", ax: cx + s * 1.6, ay: cy + r * 0.32 + k * 0.6,
+              bx: cx + s * (r + 2.8), by: cy + r * 0.32 + k * 1.5, w: 0.32, v: vb
+            });
+          }
+        });
+      }
+      // focinho alongado (cão)
+      var vf = 0.65 * m;
+      if (vf > 0.02) {
+        lista.push({ tipo: "elipse", cx: cx, cy: cy + r * 0.55 + 1.4 * m, rx: 2.3, ry: 1.4 + 2.0 * m, v: vf });
+      }
+      // nariz: pequeno no gato, grande no cão
+      lista.push({ tipo: "elipse", cx: cx, cy: cy + r * 0.25 + 0.6 * m, rx: lerp(0.8, 1.7, m), ry: lerp(0.6, 1.2, m), v: 1 });
+    }
+    return lista;
+  }
+
+  function cobre(pr, x, y) {
+    switch (pr.tipo) {
+      case "anel": {
+        var d = Math.sqrt((x - pr.cx) * (x - pr.cx) + (y - pr.cy) * (y - pr.cy));
+        return Math.abs(d - pr.r) <= pr.w / 2;
+      }
+      case "elipse": {
+        var u = (x - pr.cx) / pr.rx, w = (y - pr.cy) / pr.ry;
+        return u * u + w * w <= 1;
+      }
+      case "tri": return noTriangulo(x, y, pr.a, pr.b, pr.c);
+      case "seg": return distSeg(x, y, pr.ax, pr.ay, pr.bx, pr.by) <= pr.w;
+    }
+    return false;
+  }
+
+  /* Rasteriza com superamostragem 3×3 (bordas suaves). */
+  function rasterizar(lista) {
+    var img = new Float32Array(NPIX);
+    var S = 3;
+    for (var py = 0; py < LADO; py++) {
+      for (var px = 0; px < LADO; px++) {
+        var acc = 0;
+        for (var k = 0; k < lista.length; k++) {
+          var pr = lista[k], hits = 0;
+          for (var sy = 0; sy < S; sy++) {
+            for (var sx = 0; sx < S; sx++) {
+              if (cobre(pr, px + (sx + 0.5) / S, py + (sy + 0.5) / S)) hits++;
+            }
+          }
+          var v = pr.v * hits / (S * S);
+          if (v > acc) acc = v;
+        }
+        img[py * LADO + px] = acc;
+      }
+    }
+    return img;
+  }
+
+  /* Sorteia os parâmetros de um Desenho da classe ("gato" | "cao"). */
+  function sortearParametros(rng, classe, ambiguo) {
+    var c = CFG;
+    var esc = unif(rng, c.escalaMin, c.escalaMax);
+    var p = {
+      cx: 10 + unif(rng, -c.desloc, c.desloc),
+      cy: 10.6 + unif(rng, -c.desloc, c.desloc),
+      r: c.raio * esc,
+      traco: unif(rng, 0.9, 1.4)
+    };
+    var gato = classe === "gato";
+    if (ambiguo) {
+      // a meio caminho, inclinado só um pouco para a classe que o gerou
+      var d1 = unif(rng, 0, c.ambigOrelha), d2 = unif(rng, 0, c.ambigFocinho);
+      p.orelha = gato ? 0.5 - d1 : 0.5 + d1;
+      p.focinho = gato ? 0.5 - d2 : 0.5 + d2;
+    } else {
+      var o = unif(rng, 0, c.orelhaNormal), f = unif(rng, 0, c.focinhoNormal);
+      p.orelha = gato ? o : 1 - o;
+      p.focinho = gato ? f : 1 - f;
+    }
+    return p;
+  }
+
+  function gerarDesenho(rng, classe, ambiguo) {
+    var p = sortearParametros(rng, classe, ambiguo);
+    var limpo = rasterizar(primitivas(p));
+    var px = new Float32Array(NPIX);
+    for (var i = 0; i < NPIX; i++) {
+      var v = limpo[i] + CFG.ruido * gauss(rng);
+      px[i] = v < 0 ? 0 : v > 1 ? 1 : v;
+    }
+    return { pixels: px, limpo: limpo, classe: classe, y: classe === "gato" ? 1 : 0, ambiguo: !!ambiguo, parametros: p };
+  }
+
+  /* 240 Exemplos (120/120, 10% Ambíguos por classe) e divisão fixa 180/60,
+     balanceada por classe e com Ambíguos proporcionais. Só usa o fluxo de dados. */
+  function gerarExemplos(semente) {
+    var rng = fluxo(semente === undefined ? CFG.sementePadrao : semente, "dados");
+    var porClasse = CFG.nExemplos / 2;                         // 120
+    var nAmb = Math.round(porClasse * CFG.fracaoAmbiguos);     // 12
+    var testePorClasse = CFG.nTeste / 2;                       // 30
+    var ambTeste = Math.round(nAmb * CFG.nTeste / CFG.nExemplos); // 3
+    var exemplos = [], treino = [], teste = [];
+    ["gato", "cao"].forEach(function (classe) {
+      var normais = [], ambs = [];
+      for (var i = 0; i < porClasse; i++) {
+        var amb = i < nAmb;
+        var d = gerarDesenho(rng, classe, amb);
+        d.indice = exemplos.length;
+        exemplos.push(d);
+        (amb ? ambs : normais).push(d.indice);
+      }
+      embaralhar(normais, rng); embaralhar(ambs, rng);
+      var nNormTeste = testePorClasse - ambTeste;
+      teste = teste.concat(ambs.slice(0, ambTeste), normais.slice(0, nNormTeste));
+      treino = treino.concat(ambs.slice(ambTeste), normais.slice(nNormTeste));
+    });
+    embaralhar(treino, rng);
+    embaralhar(teste, rng);
+    treino.forEach(function (i) { exemplos[i].conjunto = "treino"; });
+    teste.forEach(function (i) { exemplos[i].conjunto = "teste"; });
+    return { exemplos: exemplos, treino: treino, teste: teste };
+  }
+
+  /* ---------------- Rede Neural 400 → H → 1 ---------------- */
+
+  function sig(z) { return 1 / (1 + Math.exp(-z)); }
+  function prender(p) { return p < CLAMP ? CLAMP : p > 1 - CLAMP ? 1 - CLAMP : p; }
+
+  function avancar(rede, x, h) {
+    var H = rede.H, W1 = rede.W1;
+    var z = rede.b2;
+    for (var j = 0; j < H; j++) {
+      var s = rede.b1[j], off = j * NPIX;
+      for (var i = 0; i < NPIX; i++) s += W1[off + i] * x[i];
+      var a = sig(s);
+      h[j] = a;
+      z += rede.W2[j] * a;
+    }
+    return sig(z);
+  }
+
+  function prever(rede, x) {
+    var h = new Float64Array(rede.H);
+    var p = prender(avancar(rede, x, h));
+    return { p: p, ocultos: Array.prototype.slice.call(h) };
+  }
+
+  function criarRede(H, sementeRede, dados) {
+    var rng = fluxo(sementeRede, "inicializacao");
+    var rede = {
+      H: H,
+      W1: new Float64Array(H * NPIX), b1: new Float64Array(H),
+      W2: new Float64Array(H), b2: 0
+    };
+    for (var k = 0; k < H * NPIX; k++) rede.W1[k] = unif(rng, -CFG.initOculta, CFG.initOculta);
+    for (var j = 0; j < H; j++) {
+      var mag = unif(rng, CFG.initSaidaMin, CFG.initSaidaMax);
+      rede.W2[j] = rng() < 0.5 ? -mag : mag;
+    }
+    // Bias de saída compensa os Pesos de saída: Probabilidade média inicial = 50%.
+    var h = new Float64Array(H), soma = 0;
+    dados.treino.forEach(function (idx) {
+      rede.b2 = 0;
+      avancar(rede, dados.exemplos[idx].pixels, h);
+      for (var j2 = 0; j2 < H; j2++) soma += rede.W2[j2] * h[j2];
+    });
+    rede.b2 = -soma / dados.treino.length;
+    return rede;
+  }
+
+  function copiarRede(r) {
+    return { H: r.H, W1: new Float64Array(r.W1), b1: new Float64Array(r.b1), W2: new Float64Array(r.W2), b2: r.b2 };
+  }
+
+  /* Erro (entropia cruzada média, com clamp) e Acurácia de um conjunto. */
+  function medir(rede, dados, indices) {
+    var h = new Float64Array(rede.H), erro = 0, certos = 0, confiantes = 0;
+    for (var k = 0; k < indices.length; k++) {
+      var ex = dados.exemplos[indices[k]];
+      var p = prender(avancar(rede, ex.pixels, h));
+      erro += ex.y ? -Math.log(p) : -Math.log(1 - p);
+      var certo = (p >= 0.5 ? 1 : 0) === ex.y;
+      if (certo) { certos++; if (Math.max(p, 1 - p) > 0.8) confiantes++; }
+    }
+    return { erro: erro / indices.length, acertos: certos, total: indices.length,
+             acuracia: certos / indices.length, confiantes: confiantes };
+  }
+
+  /* Uma Correção dos Pesos com a média do lote. */
+  function corrigir(rede, dados, lote, lr) {
+    var H = rede.H, n = lote.length;
+    var gW1 = new Float64Array(H * NPIX), gb1 = new Float64Array(H);
+    var gW2 = new Float64Array(H), gb2 = 0;
+    var h = new Float64Array(H);
+    for (var k = 0; k < n; k++) {
+      var ex = dados.exemplos[lote[k]], x = ex.pixels;
+      var p = avancar(rede, x, h);
+      var d2 = p - ex.y;
+      gb2 += d2;
+      for (var j = 0; j < H; j++) {
+        gW2[j] += d2 * h[j];
+        var d1 = d2 * rede.W2[j] * h[j] * (1 - h[j]);
+        if (d1 === 0) continue;
+        gb1[j] += d1;
+        var off = j * NPIX;
+        for (var i = 0; i < NPIX; i++) gW1[off + i] += d1 * x[i];
+      }
+    }
+    var f = lr / n;
+    for (var q = 0; q < H * NPIX; q++) rede.W1[q] -= f * gW1[q];
+    for (var j3 = 0; j3 < H; j3++) { rede.b1[j3] -= f * gb1[j3]; rede.W2[j3] -= f * gW2[j3]; }
+    rede.b2 -= f * gb2;
+  }
+
+  /* ---------------- Treinamento ---------------- */
+
+  function criarTreinamento(opcoes, dados) {
+    var o = opcoes || {};
+    var est = {
+      H: o.ocultos || CFG.ocultosPadrao,
+      lr: o.lr || CFG.lrPadrao,
+      batch: o.batch || CFG.batchPadrao,
+      sementeRede: o.sementeRede === undefined ? CFG.sementePadrao : o.sementeRede,
+      dados: dados,
+      epoca: 0,
+      historico: [],
+      aviso: { seguidas: 0, disparou: false, epoca: null, ativo: false }
+    };
+    est.rede = criarRede(est.H, est.sementeRede, dados);
+    est.W0 = new Float64Array(est.rede.W1);
+    est.rngEmb = fluxo(est.sementeRede, "embaralhamento");
+    registrar(est);
+    return est;
+  }
+
+  function registrar(est) {
+    var tr = medir(est.rede, est.dados, est.dados.treino);
+    var te = medir(est.rede, est.dados, est.dados.teste);
+    var reg = {
+      epoca: est.epoca,
+      erroTreino: tr.erro, erroTeste: te.erro,
+      acTreino: tr.acuracia, acTeste: te.acuracia,
+      acertosTreino: tr.acertos, acertosTeste: te.acertos,
+      confiantesTeste: te.confiantes
+    };
+    est.historico.push(reg);
+    atualizarAviso(est);
+    return reg;
+  }
+
+  /* FR-18: por 5 Épocas seguidas, Erro de teste ≥ 110% do seu mínimo
+     e Erro de treino ≤ 105% do seu mínimo (mínimos até aquela Época). */
+  function atualizarAviso(est) {
+    var hs = est.historico, a = est.aviso, ult = hs[hs.length - 1];
+    var minTe = Infinity, minTr = Infinity;
+    for (var i = 0; i < hs.length; i++) {
+      if (hs[i].erroTeste < minTe) minTe = hs[i].erroTeste;
+      if (hs[i].erroTreino < minTr) minTr = hs[i].erroTreino;
+    }
+    var cond = ult.erroTeste >= CFG.ofTeste * minTe && ult.erroTreino <= CFG.ofTreino * minTr;
+    a.seguidas = cond ? a.seguidas + 1 : 0;
+    a.ativo = a.seguidas >= CFG.ofSeguidas;
+    ult.aviso = a.ativo;
+    if (a.ativo && !a.disparou) { a.disparou = true; a.epoca = ult.epoca; }
+  }
+
+  function rodarEpoca(est) {
+    var ordem = embaralhar(est.dados.treino.slice(), est.rngEmb);
+    for (var k = 0; k < ordem.length; k += est.batch) {
+      corrigir(est.rede, est.dados, ordem.slice(k, k + est.batch), est.lr);
+    }
+    est.epoca++;
+    return registrar(est);
+  }
+
+  /* FR-15: mudança desde o início × sinal atual do Peso de saída
+     (positivo = empurra para "gato"). */
+  function mapas(est) {
+    var out = [];
+    for (var j = 0; j < est.H; j++) {
+      var sinal = est.rede.W2[j] < 0 ? -1 : 1;
+      var m = new Float64Array(NPIX), off = j * NPIX;
+      for (var i = 0; i < NPIX; i++) m[i] = (est.rede.W1[off + i] - est.W0[off + i]) * sinal;
+      out.push(m);
+    }
+    return out;
+  }
+
+  /* Regiões do Desenho para a meta C7: orelha e focinho na posição
+     nominal (as duas formas), e fundo = pixels que nenhum Desenho limpo toca. */
+  function regioes(dados) {
+    var nominal = { cx: 10, cy: 10.6, r: CFG.raio, traco: 1.2 };
+    function mascara(partes, valores) {
+      var acc = new Float32Array(NPIX);
+      valores.forEach(function (v) {
+        var p = Object.assign({}, nominal, { orelha: v, focinho: v });
+        var img = rasterizar(primitivas(p, partes));
+        for (var i = 0; i < NPIX; i++) if (img[i] > acc[i]) acc[i] = img[i];
+      });
+      var idx = [];
+      for (var i2 = 0; i2 < NPIX; i2++) if (acc[i2] > 0.3) idx.push(i2);
+      return idx;
+    }
+    var orelha = mascara(["orelha"], [0, 0.5, 1]);
+    var focinho = mascara(["focinho"], [0, 0.5, 1]);
+    var media = new Float32Array(NPIX);
+    dados.exemplos.forEach(function (ex) { for (var i = 0; i < NPIX; i++) media[i] += ex.limpo[i]; });
+    var fundo = [];
+    for (var i3 = 0; i3 < NPIX; i3++) if (media[i3] / dados.exemplos.length < 0.01) fundo.push(i3);
+    return { orelha: orelha, focinho: focinho, fundo: fundo };
+  }
+
+  /* Ritmo do player (FR-14): ~3 atualizações/s, no máximo 25 s. */
+  function epocasPorAtualizacao(totalEpocas) {
+    var porSeg = 1000 / CFG.intervaloMs, maxSeg = 25;
+    if (totalEpocas / porSeg <= maxSeg) return 1;
+    return Math.ceil(totalEpocas / (porSeg * maxSeg));
+  }
+
+  root.N2Core = {
+    CFG: CFG, LADO: LADO, NPIX: NPIX, CHUTE: Math.LN2, CLAMP: CLAMP,
+    mulberry32: mulberry32, derivarSemente: derivarSemente, fluxo: fluxo,
+    gerarDesenho: gerarDesenho, gerarExemplos: gerarExemplos,
+    criarRede: criarRede, copiarRede: copiarRede, prever: prever, medir: medir,
+    criarTreinamento: criarTreinamento, rodarEpoca: rodarEpoca,
+    mapas: mapas, regioes: regioes, epocasPorAtualizacao: epocasPorAtualizacao
+  };
+})(typeof window !== "undefined" ? window : this);
+</script>
+
+<script id="n2-ui">
+"use strict";
+
+/* ==================================================================
+   Nível 2 — interface. Toda a lógica vem de window.N2Core; aqui só
+   se desenha e se controla o player.
+================================================================== */
+
+(function () {
+  var N2 = window.N2Core, CFG = N2.CFG, LADO = N2.LADO, NPIX = N2.NPIX;
+
+  var dados = N2.gerarExemplos(CFG.sementePadrao);       // fluxo de dados: nunca muda
+  var rngNovos = N2.fluxo(CFG.sementePadrao, "novos");  // Desenhos Novos
+  var rngSemente = N2.mulberry32(N2.derivarSemente(CFG.sementePadrao, 5)); // "Sortear outra rede"
+
+  var hp = {
+    epocas: CFG.epocasPadrao,
+    lr: CFG.lrPadrao,
+    batch: CFG.batchPadrao,
+    ocultos: CFG.ocultosPadrao
+  };
+  var sementeRede = CFG.sementePadrao;
+  var est = null;           // estado do Treinamento (N2Core)
+  var rodando = false;
+  var timer = null;
+  var selecao = { tipo: "teste", indice: dados.teste[0], desenho: null };
+  var ui = {};
+
+  function $(id) { return document.getElementById(id); }
+
+  function num(v, casas) { return Number.isFinite(v) ? fmt(v, casas) : "—"; }
+  function pct(v, casas) { return Number.isFinite(v) ? fmt(v * 100, casas === undefined ? 1 : casas) + "%" : "—"; }
+
+  /* ---------------- Estados do Treinamento (PRD §4.10) ---------------- */
+
+  function situacao() {
+    if (rodando) return "rodando";
+    if (est.epoca === 0) return "sem";
+    if (est.epoca >= hp.epocas) return "concluido";
+    return "pausado";
+  }
+
+  function novoTreinamento() {
+    pararTimer();
+    est = N2.criarTreinamento({ ocultos: hp.ocultos, lr: hp.lr, batch: hp.batch, sementeRede: sementeRede }, dados);
+    construirRede();
+    pintarTudo();
+  }
+
+  /* ---------------- Player (FR-14) e ritmo ---------------- */
+
+  var INTERVALO_MS = CFG.intervaloMs;   // ~3 atualizações por segundo (agenda fixa)
+
+  function pararTimer() {
+    rodando = false;
+    if (timer) { clearTimeout(timer); timer = null; }
+  }
+
+  function tique() {
+    timer = null;
+    if (!rodando) return;
+    var passo = N2.epocasPorAtualizacao(hp.epocas);
+    for (var k = 0; k < passo && est.epoca < hp.epocas; k++) N2.rodarEpoca(est);
+    if (est.epoca >= hp.epocas) rodando = false;
+    pintarTudo();
+    if (rodando) {
+      proximo += INTERVALO_MS;
+      timer = setTimeout(tique, Math.max(0, proximo - Date.now()));
+    }
+  }
+
+  var proximo = 0;
+
+  function treinar() {
+    if (rodando || est.epoca >= hp.epocas) return;
+    $("n2-aviso-hp").hidden = true;
+    rodando = true;
+    pintarTudo();
+    proximo = Date.now() + INTERVALO_MS;
+    timer = setTimeout(tique, INTERVALO_MS);
+  }
+
+  /* Pausar: a Época em curso termina (o cálculo de uma atualização é
+     indivisível), e nenhuma outra começa. */
+  function pausar() {
+    if (!rodando) return;
+    pararTimer();
+    pintarTudo();
+  }
+
+  function umaEpoca() {
+    if (rodando || est.epoca >= hp.epocas) return;
+    $("n2-aviso-hp").hidden = true;
+    N2.rodarEpoca(est);
+    pintarTudo();
+  }
+
+  window.N2UI = {
+    pausar: pausar,
+    estado: function () { return { situacao: situacao(), epoca: est.epoca, hp: hp, sementeRede: sementeRede, historico: est.historico }; }
+  };
+
+  /* ---------------- Desenho em canvas 20×20 ---------------- */
+
+  function pintarPixels(canvas, px) {
+    var ctx = canvas.getContext("2d");
+    var img = ctx.createImageData(LADO, LADO);
+    for (var i = 0; i < NPIX; i++) {
+      var g = Math.round(255 * (1 - px[i]));
+      img.data[4 * i] = g; img.data[4 * i + 1] = g; img.data[4 * i + 2] = g; img.data[4 * i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  function novoCanvas() {
+    var c = document.createElement("canvas");
+    c.width = LADO; c.height = LADO;
+    c.setAttribute("aria-hidden", "true");
+    return c;
+  }
+
+  /* ---------------- Grades de Exemplos (FR-10, FR-11) ---------------- */
+
+  var minisTeste = [];
+
+  function nomeClasse(c) { return c === "gato" ? "gato" : "cão"; }
+
+  function montarGrades() {
+    var gt = $("n2-grade-teste"), gr = $("n2-grade-treino");
+    gt.className = gr.className = "n2-grade";
+    dados.teste.forEach(function (idx) {
+      var ex = dados.exemplos[idx];
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "n2-mini" + (ex.ambiguo ? " amb" : "");
+      var c = novoCanvas(); pintarPixels(c, ex.pixels);
+      var marca = document.createElement("span"); marca.className = "n2-marca"; marca.setAttribute("aria-hidden", "true");
+      var r = document.createElement("span"); r.textContent = nomeClasse(ex.classe);
+      b.appendChild(marca); b.appendChild(c); b.appendChild(r);
+      b.addEventListener("click", function () {
+        selecao = { tipo: "teste", indice: idx, desenho: null };
+        pintarClassificacao(); pintarMarcas(); pintarRede();
+      });
+      gt.appendChild(b);
+      minisTeste.push({ el: b, marca: marca, ex: ex, idx: idx });
+    });
+    dados.treino.forEach(function (idx) {
+      var ex = dados.exemplos[idx];
+      var d = document.createElement("div");
+      d.className = "n2-mini" + (ex.ambiguo ? " amb" : "");
+      d.setAttribute("role", "img");
+      d.setAttribute("aria-label", "Exemplo de treino: " + nomeClasse(ex.classe) + (ex.ambiguo ? ", Desenho Ambíguo" : ""));
+      var c = novoCanvas(); pintarPixels(c, ex.pixels);
+      var r = document.createElement("span"); r.textContent = nomeClasse(ex.classe);
+      d.appendChild(c); d.appendChild(r);
+      gr.appendChild(d);
+    });
+  }
+
+  function pintarMarcas() {
+    var treinou = est.epoca > 0, certos = 0;
+    minisTeste.forEach(function (m) {
+      var p = N2.prever(est.rede, m.ex.pixels).p;
+      var ok = (p >= 0.5 ? 1 : 0) === m.ex.y;
+      if (ok) certos++;
+      m.el.classList.toggle("ok", treinou && ok);
+      m.el.classList.toggle("erro", treinou && !ok);
+      m.el.classList.toggle("sel", selecao.tipo === "teste" && selecao.indice === m.idx);
+      m.marca.textContent = treinou ? (ok ? "✓" : "✗") : "";
+      m.el.setAttribute("aria-label", "Exemplo de teste: " + nomeClasse(m.ex.classe) +
+        (m.ex.ambiguo ? ", Desenho Ambíguo" : "") +
+        (treinou ? (ok ? ", Classificação Correta" : ", Classificação Errada") : ""));
+    });
+    $("n2-resumo-teste").innerHTML = treinou
+      ? '<span style="color:var(--on)">✓ ' + certos + " corretas</span> · " +
+        '<span style="color:var(--neg)">✗ ' + (dados.teste.length - certos) + " erradas</span> de " + dados.teste.length
+      : '<span class="n2-dim">Sem Treinamento ainda: sem marcas de Correta ou Errada.</span>';
+  }
+
+  /* ---------------- Diagrama da Rede (FR-15) ---------------- */
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function s(tag, attrs, parent) {
+    var e = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  var R = null;  // referências do diagrama
+  var GN = { inX: 8, inY: 115, inT: 100, mapX: 170, outX: 372, outY: 165, outR: 40, topo: 26, base: 322 };
+
+  function construirRede() {
+    var svg = $("n2-net");
+    svg.innerHTML = "";
+    var H = est.H;
+    R = { mapas: [], ativ: [], linhasSaida: [], entrada: [] };
+
+    var defs = s("defs", {}, svg);
+    var f = s("filter", { id: "n2-glow", x: "-60%", y: "-60%", width: "220%", height: "220%" }, defs);
+    s("feDropShadow", { dx: 0, dy: 0, stdDeviation: 5, "flood-color": "#5aa9ff", "flood-opacity": "0.8" }, f);
+
+    var gLinhas = s("g", {}, svg), gNos = s("g", {}, svg);
+
+    /* Desenho atual: os 400 pixels de Entrada */
+    s("text", { x: GN.inX + GN.inT / 2, y: GN.inY - 30, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)" }, gNos)
+      .textContent = "Entradas:";
+    s("text", { x: GN.inX + GN.inT / 2, y: GN.inY - 12, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)" }, gNos)
+      .textContent = "400 pixels";
+    var cel = GN.inT / LADO;
+    var gIn = s("g", {}, gNos);
+    s("rect", { x: GN.inX - 2, y: GN.inY - 2, width: GN.inT + 4, height: GN.inT + 4, fill: "#fff", stroke: "var(--line)", "stroke-width": 2 }, gIn);
+    for (var i = 0; i < NPIX; i++) {
+      R.entrada.push(s("rect", {
+        x: GN.inX + (i % LADO) * cel, y: GN.inY + Math.floor(i / LADO) * cel,
+        width: cel + 0.3, height: cel + 0.3, fill: "#fff"
+      }, gIn));
+    }
+
+    /* Camada Oculta: um mapa 20×20 por neurônio */
+    var faixa = (GN.base - GN.topo) / H;
+    var lado = Math.min(64, Math.floor(faixa - 8));
+    var celM = lado / LADO;
+    s("text", { x: GN.mapX + lado / 2 + 14, y: 16, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)", "font-weight": 600 }, gNos)
+      .textContent = "Camada Oculta";
+
+    for (var j = 0; j < H; j++) {
+      var y = GN.topo + faixa * j + (faixa - lado) / 2;
+      var cy = y + lado / 2;
+      /* conexões (simbólicas) dos pixels até o neurônio */
+      s("path", {
+        d: "M" + (GN.inX + GN.inT + 4) + " " + (GN.inY + GN.inT / 2) + " C " + (GN.mapX - 40) + " " + (GN.inY + GN.inT / 2) +
+           ", " + (GN.mapX - 60) + " " + cy + ", " + (GN.mapX - 3) + " " + cy,
+        fill: "none", stroke: "var(--line)", "stroke-width": 2, opacity: 0.8
+      }, gLinhas);
+      /* conexão até o Neurônio de Saída: cor = sinal, espessura = força */
+      var ax = GN.mapX + lado + 26;
+      R.linhasSaida.push(s("line", {
+        x1: ax + 9, y1: cy, x2: GN.outX - GN.outR, y2: GN.outY, "stroke-linecap": "round"
+      }, gLinhas));
+
+      var g = s("g", {}, gNos);
+      s("rect", { x: GN.mapX - 2, y: y - 2, width: lado + 4, height: lado + 4, fill: "var(--panel-2)", stroke: "var(--line)", "stroke-width": 2, rx: 3 }, g);
+      var cels = [];
+      for (var k = 0; k < NPIX; k++) {
+        cels.push(s("rect", {
+          x: GN.mapX + (k % LADO) * celM, y: y + Math.floor(k / LADO) * celM,
+          width: celM + 0.2, height: celM + 0.2, fill: "#222c42"
+        }, g));
+      }
+      R.mapas.push(cels);
+      /* saída do neurônio oculto para o Desenho atual (sigmoide, 0 a 1) */
+      s("circle", { cx: ax, cy: cy, r: 9, fill: "var(--off-soft)", stroke: "var(--off)", "stroke-width": 2 }, g);
+      R.ativ.push(s("circle", { cx: ax, cy: cy, r: 7, fill: "var(--on)", opacity: 0 }, g));
+    }
+
+    /* Neurônio de Saída */
+    s("text", { x: GN.outX, y: GN.outY - GN.outR - 30, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)", "font-weight": 600 }, gNos)
+      .textContent = "Neurônio";
+    s("text", { x: GN.outX, y: GN.outY - GN.outR - 12, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)", "font-weight": 600 }, gNos)
+      .textContent = "de Saída";
+    R.outAnel = s("circle", { cx: GN.outX, cy: GN.outY, r: GN.outR, fill: "var(--panel-2)", stroke: "var(--accent)", "stroke-width": 3 }, gNos);
+    R.outTxt = s("text", { x: GN.outX, y: GN.outY + 2, "text-anchor": "middle", "font-size": 21, "font-weight": 800, fill: "#fff" }, gNos);
+    s("text", { x: GN.outX, y: GN.outY + 21, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)" }, gNos)
+      .textContent = "gato";
+    R.outCls = s("text", { x: GN.outX, y: GN.outY + GN.outR + 22, "text-anchor": "middle", "font-size": 16, "font-weight": 800, fill: "var(--txt)" }, gNos);
+    s("text", { x: GN.outX, y: GN.outY + GN.outR + 42, "text-anchor": "middle", "font-size": 14, fill: "var(--txt-dim)" }, gNos)
+      .textContent = "Probabilidade";
+  }
+
+  /* Escala fixa e única (CFG.escalaMapa): mesma cor = mesma mudança,
+     em qualquer neurônio e em qualquer Época. */
+  var NEUTRO = [34, 44, 66], AZUL = [90, 169, 255], VERM = [248, 113, 113];
+  function corMapa(v) {
+    var t = Math.max(-1, Math.min(1, v / CFG.escalaMapa));
+    var alvo = t >= 0 ? AZUL : VERM, a = Math.abs(t);
+    return "rgb(" + Math.round(NEUTRO[0] + (alvo[0] - NEUTRO[0]) * a) + "," +
+      Math.round(NEUTRO[1] + (alvo[1] - NEUTRO[1]) * a) + "," + Math.round(NEUTRO[2] + (alvo[2] - NEUTRO[2]) * a) + ")";
+  }
+
+  function desenhoSelecionado() {
+    if (selecao.tipo === "novo") return selecao.desenho;
+    return dados.exemplos[selecao.indice];
+  }
+
+  function pintarRede() {
+    var d = desenhoSelecionado();
+    for (var i = 0; i < NPIX; i++) {
+      var g = Math.round(255 * (1 - d.pixels[i]));
+      R.entrada[i].setAttribute("fill", "rgb(" + g + "," + g + "," + g + ")");
+    }
+    var mps = N2.mapas(est);
+    mps.forEach(function (m, j) {
+      var cels = R.mapas[j];
+      for (var k = 0; k < NPIX; k++) cels[k].setAttribute("fill", corMapa(m[k]));
+    });
+    var pr = N2.prever(est.rede, d.pixels);
+    pr.ocultos.forEach(function (a, j) { R.ativ[j].setAttribute("opacity", Number.isFinite(a) ? a : 0); });
+    for (var j = 0; j < est.H; j++) {
+      var w = est.rede.W2[j];
+      var l = R.linhasSaida[j];
+      l.setAttribute("stroke", w < 0 ? "var(--neg)" : "var(--accent)");
+      l.setAttribute("stroke-width", 1.5 + Math.min(Math.abs(w), 5) * 1.7);
+    }
+    var gato = pr.p >= 0.5;
+    R.outTxt.textContent = pct(pr.p, 0);
+    R.outAnel.setAttribute("stroke", gato ? "var(--accent)" : "var(--neg)");
+    R.outCls.textContent = gato ? "→ gato" : "→ cão";
+    R.outCls.setAttribute("fill", gato ? "var(--accent)" : "var(--neg)");
+    $("n2-net-desc").textContent = "Rede Neural com " + est.H + " neurônios na Camada Oculta. " +
+      "Probabilidade de gato para o Desenho atual: " + pct(pr.p) + ".";
+  }
+
+  /* ---------------- Curvas (FR-16) ---------------- */
+
+  var GW = 396;
+  function grafico(svg, altura, teto, valores, opcoes) {
+    svg.innerHTML = "";
+    var x0 = 46, x1 = GW - 12, y0 = altura - 22, y1 = 8;
+    var nEp = Math.max(hp.epocas, est.epoca, 1);
+    function X(e) { return x0 + (e / nEp) * (x1 - x0); }
+    function Y(v) { var c = Math.max(0, Math.min(teto, Number.isFinite(v) ? v : teto)); return y0 - (c / teto) * (y0 - y1); }
+    s("rect", { x: x0, y: y1, width: x1 - x0, height: y0 - y1, fill: "#0d1220", stroke: "var(--line)" }, svg);
+    opcoes.marcas.forEach(function (m) {
+      s("line", { x1: x0, y1: Y(m.v), x2: x1, y2: Y(m.v), stroke: m.cor || "var(--line)", "stroke-dasharray": m.tracejado ? "4 4" : "", "stroke-width": 1.5 }, svg);
+      s("text", { x: x0 - 5, y: Y(m.v) + 5, "text-anchor": "end", "font-size": 14, fill: m.cor || "var(--txt-dim)" }, svg).textContent = m.txt;
+      if (m.nome) s("text", { x: x1 - 4, y: Y(m.v) - 5, "text-anchor": "end", "font-size": 14, fill: m.cor }, svg).textContent = m.nome;
+    });
+    s("text", { x: x0, y: altura - 5, "font-size": 14, fill: "var(--txt-dim)" }, svg).textContent = "Época 0";
+    s("text", { x: x1, y: altura - 5, "text-anchor": "end", "font-size": 14, fill: "var(--txt-dim)" }, svg).textContent = String(nEp);
+    [["treino", "var(--accent)", ""], ["teste", "var(--warn)", "6 4"]].forEach(function (serie) {
+      var pts = valores.map(function (h) { return X(h.epoca).toFixed(1) + "," + Y(h[serie[0]]).toFixed(1); });
+      if (pts.length === 1) pts.push(pts[0]);
+      s("polyline", { points: pts.join(" "), fill: "none", stroke: serie[1], "stroke-width": 3, "stroke-dasharray": serie[2], "stroke-linejoin": "round" }, svg);
+    });
+  }
+
+  function pintarCurvas() {
+    var hs = est.historico, ult = hs[hs.length - 1];
+    grafico($("n2-graf-erro"), 128, 1.5,
+      hs.map(function (h) { return { epoca: h.epoca, treino: h.erroTreino, teste: h.erroTeste }; }),
+      { marcas: [{ v: 1.5, txt: "1,5" }, { v: N2.CHUTE, txt: fmt(N2.CHUTE, 2), cor: "#c4b5fd", tracejado: true, nome: "chute (50% para tudo)" }, { v: 0, txt: "0" }] });
+    grafico($("n2-graf-ac"), 110, 1,
+      hs.map(function (h) { return { epoca: h.epoca, treino: h.acTreino, teste: h.acTeste }; }),
+      { marcas: [{ v: 1, txt: "100%" }, { v: 0.5, txt: "50%", tracejado: true }, { v: 0, txt: "0%" }] });
+    $("n2-num-erro").innerHTML = 'Erro no treino: <b style="color:var(--accent)">' + num(ult.erroTreino, 3) +
+      '</b> · Erro no teste: <b style="color:var(--warn)">' + num(ult.erroTeste, 3) + "</b>";
+    $("n2-num-ac").innerHTML = 'Acurácia no treino: <b style="color:var(--accent)">' + pct(ult.acTreino) +
+      '</b> · Acurácia no teste: <b style="color:var(--warn)">' + pct(ult.acTeste) + "</b>";
+
+    var av = $("n2-aviso-of");
+    av.setAttribute("aria-live", rodando ? "off" : "polite");
+    if (est.aviso.ativo) {
+      var minTe = Math.min.apply(null, hs.map(function (h) { return h.erroTeste; }));
+      av.hidden = false;
+      av.innerHTML = "<b>⚠️ Overfitting (desde a Época " + est.aviso.epoca + ").</b> O Erro no treino continua caindo, " +
+        "mas o Erro no teste está " + fmt((ult.erroTeste / minTe - 1) * 100, 0) + "% acima do seu melhor valor: " +
+        "a rede está decorando os Exemplos de treino em vez de aprender o padrão.";
+    } else if (est.aviso.disparou) {
+      av.hidden = false;
+      av.innerHTML = "<b>⚠️ Houve Overfitting a partir da Época " + est.aviso.epoca + ".</b> Naquele trecho, o Erro no treino " +
+        "caía enquanto o Erro no teste subia: a rede estava decorando os Exemplos de treino.";
+    } else {
+      av.hidden = true;
+    }
+  }
+
+  /* ---------------- Classificação (FR-17) ---------------- */
+
+  function pintarClassificacao() {
+    var d = desenhoSelecionado();
+    pintarPixels($("n2-grande"), d.pixels);
+    var p = N2.prever(est.rede, d.pixels).p;
+    var gato = p >= 0.5, conf = gato ? p : 1 - p;
+    var certo = (gato ? 1 : 0) === d.y;
+    $("n2-cl-origem").textContent = selecao.tipo === "novo"
+      ? "Desenho Novo, gerado agora (não está em nenhum Conjunto)"
+      : "Exemplo do Conjunto de Teste (a rede nunca usou para aprender)";
+    var resp = $("n2-cl-resposta");
+    resp.setAttribute("aria-live", rodando ? "off" : "polite");
+    resp.textContent = (gato ? "Gato" : "Cão") + " — " + pct(conf, 0);
+    resp.style.color = gato ? "var(--accent)" : "var(--neg)";
+    $("n2-barra-marca").style.left = (Math.max(0, Math.min(1, p)) * 100).toFixed(1) + "%";
+    var v = $("n2-cl-verdade");
+    v.innerHTML = "Classe verdadeira: " + nomeClasse(d.classe) + (d.ambiguo ? " (Desenho Ambíguo)" : "") + " · " +
+      (certo ? '<span style="color:var(--on)">✓ Classificação Correta</span>'
+             : '<span style="color:var(--neg)">✗ Classificação Errada</span>');
+    var duv = $("n2-cl-duvida");
+    if (est.epoca === 0) {
+      duv.textContent = "A rede ainda não treinou: ela está chutando, perto de 50% para qualquer Desenho.";
+    } else if (d.ambiguo) {
+      duv.textContent = "Este é um Desenho Ambíguo: tem traços de cão e de gato. Hesitar ou errar aqui é dúvida da rede, não falha do simulador.";
+    } else if (conf < 0.7) {
+      duv.textContent = "A rede está em dúvida neste Desenho: a Confiança está perto de 50%.";
+    } else if (!certo) {
+      duv.textContent = "A rede errou com convicção: ela aprendeu quais pixels pesam mais, não o que é um gato.";
+    } else {
+      duv.textContent = "";
+    }
+  }
+
+  /* ---------------- Hiperparâmetros (FR-12, FR-13) ---------------- */
+
+  var HP = [
+    { id: "epocas", nome: "Épocas (epochs)", min: CFG.EPOCAS_MIN, max: CFG.EPOCAS_MAX,
+      apoio: "Uma Época é uma passada completa da rede por todos os Exemplos de treino. Mais Épocas não é sempre melhor." },
+    { id: "lr", nome: "Learning Rate (taxa de aprendizado)", valores: CFG.LR_VALORES,
+      apoio: "O tamanho de cada Correção dos Pesos. Pequeno demais, a rede aprende devagar; grande demais, passa do ponto e não se estabiliza." },
+    { id: "batch", nome: "Batch Size (tamanho do lote)", valores: CFG.BATCH_VALORES,
+      apoio: "Quantos Exemplos a rede olha antes de cada Correção dos Pesos. Lote pequeno: muitas correções, mais nervosas; lote grande: poucas, mais estáveis." },
+    { id: "ocultos", nome: "Neurônios da Camada Oculta", min: CFG.OCULTOS_MIN, max: CFG.OCULTOS_MAX,
+      apoio: "Quantos neurônios ficam entre os pixels e o Neurônio de Saída. Cada um ganha seu mapa de Pesos no diagrama." }
+  ];
+
+  function valorDoSlider(def, sl) { return def.valores ? def.valores[parseInt(sl.value, 10)] : parseInt(sl.value, 10); }
+  function sliderDoValor(def, v) { return def.valores ? def.valores.indexOf(v) : v; }
+
+  function montarControles() {
+    var box = $("n2-controles");
+    HP.forEach(function (def) {
+      var linha = document.createElement("div");
+      linha.className = "n2-hp";
+      var esq = document.createElement("div");
+      var head = document.createElement("div");
+      head.className = "n2-hp-head";
+      var lab = document.createElement("label");
+      lab.htmlFor = "n2-hp-" + def.id;
+      lab.textContent = def.nome;
+      var val = document.createElement("span");
+      val.className = "n2-hp-val";
+      head.appendChild(lab); head.appendChild(val);
+      var sl = document.createElement("input");
+      sl.type = "range"; sl.id = "n2-hp-" + def.id;
+      sl.min = def.valores ? 0 : def.min;
+      sl.max = def.valores ? def.valores.length - 1 : def.max;
+      sl.step = 1;
+      sl.value = sliderDoValor(def, hp[def.id]);
+      var ticks = document.createElement("div");
+      ticks.className = "ticks"; ticks.setAttribute("aria-hidden", "true");
+      var ext = def.valores ? [def.valores[0], def.valores[def.valores.length - 1]] : [def.min, def.max];
+      ticks.innerHTML = "<span>" + fmt(ext[0], 2) + "</span><span>" + fmt(ext[1], 2) + "</span>";
+      esq.appendChild(head); esq.appendChild(sl); esq.appendChild(ticks);
+      var ap = document.createElement("p");
+      ap.className = "n2-apoio"; ap.textContent = def.apoio;
+      linha.appendChild(esq); linha.appendChild(ap);
+      box.appendChild(linha);
+      def.sl = sl; def.val = val;
+      sl.addEventListener("input", function () { mudarHiperparametro(def); });
+    });
+  }
+
+  function mudarHiperparametro(def) {
+    var novo = valorDoSlider(def, def.sl);
+    var sit = situacao();
+    if (def.id === "epocas") {
+      /* Rodando: só aumentar. Pausado/Concluído: não abaixo da Época atual. */
+      var minimo = sit === "rodando" ? Math.max(hp.epocas, est.epoca + 1) : Math.max(CFG.EPOCAS_MIN, est.epoca);
+      if (novo < minimo) { novo = minimo; def.sl.value = novo; }
+      hp.epocas = novo;
+      pintarTudo();
+      return;
+    }
+    if (sit === "rodando" || sit === "pausado") { def.sl.value = sliderDoValor(def, hp[def.id]); return; }
+    if (novo === hp[def.id]) return;
+    hp[def.id] = novo;
+    var aviso = $("n2-aviso-hp");
+    if (sit === "concluido") {
+      aviso.hidden = false;
+      aviso.textContent = "⚠️ " + def.nome.split(" (")[0] + " mudou: o Treinamento recomeça do zero com os novos Hiperparâmetros.";
+    } else {
+      aviso.hidden = true;
+    }
+    novoTreinamento();
+  }
+
+  function pintarControles() {
+    var sit = situacao();
+    HP.forEach(function (def) {
+      var v = hp[def.id];
+      def.val.textContent = fmt(v, 2);
+      def.sl.value = sliderDoValor(def, v);
+      def.sl.disabled = def.id !== "epocas" && (sit === "rodando" || sit === "pausado");
+      def.sl.setAttribute("aria-valuetext", fmt(v, 2));
+    });
+  }
+
+  /* ---------------- Pintura geral ---------------- */
+
+  var NOMES_SIT = { sem: "Sem Treinamento", rodando: "Treinando…", pausado: "Pausado", concluido: "Concluído" };
+
+  function pintarTudo() {
+    var sit = situacao();
+    $("n2-contador").textContent = "Época " + est.epoca + " de " + hp.epocas;
+    $("n2-estado").textContent = NOMES_SIT[sit];
+    var bt = $("n2-treinar");
+    bt.disabled = sit === "rodando" || sit === "concluido";
+    bt.textContent = sit === "pausado" ? "▶ Continuar" : "▶ Treinar";
+    $("n2-pausar").disabled = sit !== "rodando";
+    $("n2-passo").disabled = sit === "rodando" || sit === "concluido";
+    $("n2-reiniciar").disabled = sit === "sem";
+    var padrao = sementeRede === CFG.sementePadrao;
+    $("n2-padrao").disabled = padrao;
+    $("n2-semente").textContent = "Semente " + sementeRede + (padrao ? " (padrão)" : "");
+    pintarControles();
+    pintarMarcas();
+    pintarRede();
+    pintarCurvas();
+    pintarClassificacao();
+  }
+
+  /* ---------------- Ligações ---------------- */
+
+  $("n2-treinar").addEventListener("click", treinar);
+  $("n2-pausar").addEventListener("click", pausar);
+  $("n2-passo").addEventListener("click", umaEpoca);
+  $("n2-reiniciar").addEventListener("click", function () { $("n2-aviso-hp").hidden = true; novoTreinamento(); });
+  $("n2-sortear").addEventListener("click", function () {
+    var anterior = sementeRede;
+    do { sementeRede = 1 + Math.floor(rngSemente() * 99999); } while (sementeRede === CFG.sementePadrao || sementeRede === anterior);
+    $("n2-aviso-hp").hidden = true;
+    novoTreinamento();
+  });
+  $("n2-padrao").addEventListener("click", function () {
+    sementeRede = CFG.sementePadrao;
+    $("n2-aviso-hp").hidden = true;
+    novoTreinamento();
+  });
+  $("n2-novo").addEventListener("click", function () {
+    var classe = rngNovos() < 0.5 ? "gato" : "cao";
+    var amb = rngNovos() < CFG.fracaoAmbiguos;
+    selecao = { tipo: "novo", indice: null, desenho: N2.gerarDesenho(rngNovos, classe, amb) };
+    pintarMarcas(); pintarRede(); pintarClassificacao();
+  });
+
+  /* Atalhos do Nível 2: só com a aba dele ativa e fora de controles. */
+  document.addEventListener("keydown", function (ev) {
+    if (nivelAtivo !== 2 || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+    var t = ev.target && ev.target.tagName;
+    if (t === "INPUT" || t === "BUTTON" || t === "SELECT" || t === "TEXTAREA") return;
+    if (ev.key === " " || ev.key === "Spacebar") {
+      ev.preventDefault();
+      if (ev.repeat) return;
+      if (rodando) pausar(); else treinar();
+    } else if (ev.key === "ArrowRight") {
+      ev.preventDefault();
+      umaEpoca();
+    }
+  });
+
+  montarGrades();
+  montarControles();
+  novoTreinamento();
+})();
+
+/* ================= Abas de Nível (FR-9) ================= */
+
+(function () {
+  var abas = [document.getElementById("tab-n1"), document.getElementById("tab-n2")];
+  var paineis = [document.getElementById("nivel1"), document.getElementById("nivel2")];
+
+  function ativar(n, foco) {
+    if (n === nivelAtivo) return;
+    if (n !== 2) window.N2UI.pausar();          // Treinamento pausa fora da aba
+    nivelAtivo = n;
+    abas.forEach(function (a, i) {
+      var sel = i + 1 === n;
+      a.setAttribute("aria-selected", sel ? "true" : "false");
+      a.tabIndex = sel ? 0 : -1;
+      paineis[i].hidden = !sel;
+    });
+    if (foco) abas[n - 1].focus();
+    if (n === 1) iniciarAnimacaoN1();
+  }
+
+  abas.forEach(function (a, i) {
+    a.addEventListener("click", function () { ativar(i + 1, false); });
+    a.addEventListener("keydown", function (ev) {
+      if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
+        ev.preventDefault();
+        ativar(i === 0 ? 2 : 1, true);
+      }
+    });
+  });
+})();
 </script>
 
 </body>
