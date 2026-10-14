@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de Neurônio Artificial — Vai ter Churrasco?</title>
+<style>
+  :root {
+    --bg: #0d1220;
+    --panel-solid: #192133;
+    --panel-2: #222c42;
+    --line: #313d57;
+    --txt: #eef2f9;
+    --txt-dim: #9fb0cc;
+    --accent: #5aa9ff;
+    --on: #22c55e;
+    --on-soft: #14301d;
+    --off: #8da0bd;
+    --off-soft: #262c3a;
+    --warn: #fbbf24;
+    --neg: #f87171;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 12px 20px 22px;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  h1 { margin: 0 0 2px; font-size: 22px; letter-spacing: -0.3px; }
+
+  .sub { margin: 0 0 10px; color: var(--txt-dim); font-size: 14.5px; max-width: 1000px; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  /* ---------- Cenários (FR-1) ---------- */
+
+  .topbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+
+  .scenarios { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .scenarios button {
+    font: inherit; font-weight: 600; font-size: 15px;
+    color: var(--txt-dim);
+    background: var(--panel-solid);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px; cursor: pointer;
+  }
+
+  .scenarios button:hover { border-color: var(--accent); color: var(--txt); }
+
+  .scenarios button[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent); color: #06121f;
+  }
+
+  #reset {
+    font: inherit; font-weight: 600; font-size: 14.5px;
+    margin-left: auto;
+    color: var(--txt-dim);
+    background: var(--panel-solid);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px; cursor: pointer;
+  }
+
+  #reset:hover { border-color: var(--accent); color: var(--txt); }
+
+  /* ---------- Diagrama (protagonista) ---------- */
+
+  .stage {
+    background:
+      radial-gradient(ellipse 60% 70% at 52% 45%, #1b2541 0%, transparent 70%),
+      var(--panel-solid);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 4px 8px 0;
+  }
+
+  #net { display: block; width: 100%; height: auto; }
+
+  #net text { font-family: inherit; }
+
+  .node-hit { cursor: pointer; }
+  .node-hit:hover .node-ring { stroke: #fff; }
+
+  /* ---------- Faixa da conta (FR-5) ---------- */
+
+  .mathbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 10px; padding: 10px 14px;
+    background: var(--panel-solid);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 15.5px;
+  }
+
+  .mathbar .lbl {
+    font-size: 12px; letter-spacing: .5px;
+    text-transform: uppercase; color: var(--txt-dim);
+  }
+
+  .mathbar .term { color: var(--accent); white-space: nowrap; }
+  .mathbar .bias { color: var(--warn); white-space: nowrap; }
+  .mathbar .sum  { color: #fff; font-weight: 700; font-size: 18px; }
+  .mathbar .verdict { font-weight: 700; }
+
+  /* ---------- Controles compactos (FR-3, FR-4) ---------- */
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap: 10px; margin-top: 10px;
+  }
+
+  .ctl {
+    background: var(--panel-solid);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 8px 12px 6px;
+  }
+
+  .ctl.bias { border-left-color: var(--warn); }
+
+  .ctl-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; font-size: 14px; color: var(--txt-dim);
+  }
+
+  .ctl-head b { color: var(--txt); font-size: 14.5px; font-weight: 600; }
+
+  .ctl-val {
+    font-variant-numeric: tabular-nums; font-weight: 700;
+    font-size: 16px; color: var(--accent);
+  }
+
+  .ctl.bias .ctl-val { color: var(--warn); }
+
+  input[type="range"] {
+    width: 100%; display: block; margin: 2px 0 0;
+    height: 22px; accent-color: var(--accent);
+  }
+
+  .ctl.bias input[type="range"] { accent-color: var(--warn); }
+
+  .ticks {
+    display: flex; justify-content: space-between;
+    color: var(--txt-dim); font-size: 11px;
+    font-variant-numeric: tabular-nums; margin-top: -2px;
+  }
+
+  .legend {
+    margin-top: 12px; color: var(--txt-dim); font-size: 13px;
+    border-top: 1px solid var(--line); padding-top: 10px;
+  }
+
+  .legend b { color: var(--txt); }
+
+  noscript .fallback {
+    display: block; margin: 14px 0; padding: 14px 16px;
+    border: 2px solid var(--warn); border-radius: 12px;
+    background: #2a2210; color: var(--txt); font-size: 16px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🧠 Simulador de Neurônio Artificial</h1>
+<p class="sub">
+  <b>Clique nos círculos da esquerda</b> para ligar ou desligar cada entrada e veja o sinal viajar pelas conexões
+  até o neurônio. Ele soma tudo (a <b>Soma Ponderada</b>), entrega o total para a <b>função de ativação</b> e,
+  se o total alcançar o <b>limiar</b>, o neurônio dispara.
+</p>
+
+<noscript>
+  <div class="fallback">
+    <b>⚠️ Este simulador precisa de JavaScript para funcionar.</b><br>
+    O diagrama do neurônio é desenhado pelo navegador. Abra o arquivo <code>simulador-neuronio.html</code>
+    dando dois cliques nele, em um navegador comum (Chrome, Edge, Firefox ou Safari), com JavaScript habilitado.
+    Não é preciso internet.
+  </div>
+</noscript>
+
+<div class="topbar">
+  <div class="scenarios" id="scenarios" role="group" aria-label="Escolha do cenário"></div>
+  <button type="button" id="reset">↺ Reiniciar cenário</button>
+</div>
+
+<p class="sr-only" id="sr-status" aria-live="polite"></p>
+
+<!-- O diagrama: entradas → conexões → corpo do neurônio → função de ativação → saída -->
+<div class="stage">
+  <svg id="net" viewBox="0 0 1040 470" role="img" aria-labelledby="net-desc"></svg>
+  <p class="sr-only" id="net-desc"></p>
+</div>
+
+<!-- FR-5: a conta com os números reais -->
+<div class="mathbar">
+  <span class="lbl">Soma&nbsp;Ponderada</span>
+  <span id="formula"></span>
+  <span class="lbl" style="margin-left:auto">Decisão</span>
+  <span id="verdict" class="verdict"></span>
+</div>
+
+<!-- FR-3 e FR-4: ajuste de pesos e bias -->
+<div class="controls" id="controls"></div>
+
+<p class="legend">
+  <b>Limiar fixo em 1</b> neste simulador, para você mexer em menos coisas de uma vez.
+  Um neurônio de verdade funciona exatamente assim — a diferença é que, numa rede neural,
+  milhares deles ficam ligados uns nos outros, e os pesos não são ajustados à mão:
+  são <b>aprendidos</b> a partir de exemplos.
+</p>
+
+<script>
+"use strict";
+
+/* ==================================================================
+   Cenários pré-definidos (FR-1).
+   Pesos e bias padrão deixam o estado inicial (entradas todas em
+   "Não") abaixo do limiar, para o aluno ver a transição ao ligar.
+================================================================== */
+
+var LIMIAR = 1;
+
+var CENARIOS = [
+  {
+    id: "churrasco",
+    aba: "🍖 Vai ter churrasco?",
+    pergunta: "Vai ter churrasco?",
+    entradas: [
+      { nome: "Tem carne?",   peso: 3 },
+      { nome: "Tem carvão?",  peso: 2 },
+      { nome: "Tem cerveja?", peso: 1.5 }
+    ],
+    bias: -1,
+    ativado:    { emoji: "🍖", msg: "Vai ter churrasco!" },
+    naoAtivado: { emoji: "😞", msg: "Não vai ter churrasco" }
+  },
+  {
+    id: "chuva",
+    aba: "🌧️ Vai chover?",
+    pergunta: "Vai chover?",
+    entradas: [
+      { nome: "Céu nublado?",               peso: 2 },
+      { nome: "Vento forte?",               peso: 1.5 },
+      { nome: "Previsão do app diz chuva?", peso: 3 }
+    ],
+    bias: -1.5,
+    ativado:    { emoji: "🌧️", msg: "Vai chover!" },
+    naoAtivado: { emoji: "☀️",  msg: "Não vai chover" }
+  }
+];
+
+/* ================= Estado ================= */
+
+var cenarioAtual = CENARIOS[0];
+var estado = null;         // { entradas: [{ligada, peso}], bias }
+var ultimoAtivado = null;
+var botoesAba = [];
+var SVGNS = "http://www.w3.org/2000/svg";
+var semAnimacao = window.matchMedia &&
+                  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Número em formato brasileiro: 3 -> "3", 1.5 -> "1,5" */
+function fmt(n) {
+  var r = Math.round(n * 10) / 10;
+  if (r === 0) r = 0;
+  return r.toString().replace(".", ",");
+}
+
+/* ================= Geometria do diagrama ================= */
+
+var G = {
+  labelX: 236,        // rótulos das entradas, alinhados à direita
+  inX: 306, inR: 44,  // círculos de entrada
+  biasX: 306, biasY: 420, biasR: 30,
+  nX: 576, nY: 212, nR: 100,           // corpo do neurônio
+  fx: 700, fy: 152, fw: 124, fh: 124,  // caixa da função de ativação
+  outX: 952, outY: 212, outR: 62       // saída
+};
+
+function el(tag, attrs, parent) {
+  var e = document.createElementNS(SVGNS, tag);
+  for (var k in attrs) {
+    if (Object.prototype.hasOwnProperty.call(attrs, k)) {
+      e.setAttribute(k, attrs[k]);
+    }
+  }
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+/* Quebra um rótulo em até 2 linhas */
+function quebrar(txt, max) {
+  var palavras = txt.split(" ");
+  var l1 = "", l2 = "";
+  for (var i = 0; i < palavras.length; i++) {
+    if (!l2 && (l1 + " " + palavras[i]).trim().length <= max) {
+      l1 = (l1 + " " + palavras[i]).trim();
+    } else {
+      l2 = (l2 + " " + palavras[i]).trim();
+    }
+  }
+  return l2 ? [l1, l2] : [l1];
+}
+
+/* Encurta a linha entre dois nós pelos respectivos raios */
+function aresta(ax, ay, ar, bx, by, br) {
+  var dx = bx - ax, dy = by - ay;
+  var d = Math.sqrt(dx * dx + dy * dy) || 1;
+  var ux = dx / d, uy = dy / d;
+  return {
+    x1: ax + ux * ar,  y1: ay + uy * ar,
+    x2: bx - ux * br,  y2: by - uy * br
+  };
+}
+
+/* ================= Construção do SVG ================= */
+
+var refs = null;  // elementos que mudam a cada quadro
+
+function construirDiagrama() {
+  var svg = document.getElementById("net");
+  svg.innerHTML = "";
+
+  refs = { entradas: [], pulsos: [] };
+
+  /* --- filtros de brilho --- */
+  var defs = el("defs", {}, svg);
+  [["glowOn", "#22c55e", "7"], ["glowAccent", "#5aa9ff", "5"]].forEach(function (g) {
+    var f = el("filter", { id: g[0], x: "-60%", y: "-60%", width: "220%", height: "220%" }, defs);
+    el("feDropShadow", {
+      dx: 0, dy: 0, stdDeviation: g[2], "flood-color": g[1], "flood-opacity": "0.85"
+    }, f);
+  });
+
+  /* Ordem de pintura: conexões, pulsos viajando, etiquetas de peso, nós.
+     As etiquetas vêm depois dos pulsos para que nenhum sinal passe por cima delas. */
+  var gArestas = el("g", {}, svg);
+  var gPulsos  = el("g", {}, svg);
+  var gPesos   = el("g", {}, svg);
+  var gNos     = el("g", {}, svg);
+
+  /* ---------- Entradas: rótulo + círculo clicável (FR-2) ---------- */
+
+  var n = cenarioAtual.entradas.length;
+  var espaco = 132;
+  var y0 = G.nY - ((n - 1) * espaco) / 2;
+
+  cenarioAtual.entradas.forEach(function (ent, i) {
+    var cy = y0 + i * espaco;
+
+    /* conexão entrada → neurônio */
+    var a = aresta(G.inX, cy, G.inR, G.nX, G.nY, G.nR);
+    var linha = el("line", {
+      x1: a.x1, y1: a.y1, x2: a.x2, y2: a.y2,
+      stroke: "var(--line)", "stroke-width": 3, "stroke-linecap": "round"
+    }, gArestas);
+
+    /* etiqueta do peso sobre a conexão */
+    var tx = a.x1 + (a.x2 - a.x1) * 0.60;
+    var ty = a.y1 + (a.y2 - a.y1) * 0.60;
+    var pill = el("rect", {
+      x: tx - 30, y: ty - 15, width: 60, height: 26, rx: 13,
+      fill: "#0d1220", stroke: "var(--line)"
+    }, gPesos);
+    var pesoTxt = el("text", {
+      x: tx, y: ty + 4, "text-anchor": "middle",
+      "font-size": 15, "font-weight": 700, fill: "var(--accent)"
+    }, gPesos);
+
+    /* pulsos viajando pela conexão quando a entrada está ligada */
+    var pulsos = [];
+    for (var p = 0; p < 3; p++) {
+      pulsos.push(el("circle", { r: 5, fill: "#fff", opacity: 0 }, gPulsos));
+    }
+    refs.pulsos.push({ a: a, circulos: pulsos, fase: i * 0.13 });
+
+    /* rótulo à esquerda */
+    var linhas = quebrar(ent.nome, 15);
+    var t = el("text", {
+      x: G.labelX, y: cy - (linhas.length - 1) * 10 + 5,
+      "text-anchor": "end", "font-size": 15.5, fill: "var(--txt)"
+    }, gNos);
+    linhas.forEach(function (ln, k) {
+      el("tspan", { x: G.labelX, dy: k === 0 ? 0 : 19 }, t).textContent = ln;
+    });
+
+    /* o círculo da entrada é o próprio interruptor */
+    var grupo = el("g", {
+      class: "node-hit", tabindex: 0, role: "button",
+      "aria-pressed": "false", "aria-label": ent.nome
+    }, gNos);
+
+    var anel = el("circle", {
+      class: "node-ring", cx: G.inX, cy: cy, r: G.inR,
+      fill: "var(--off-soft)", stroke: "var(--off)", "stroke-width": 3
+    }, grupo);
+
+    var valor = el("text", {
+      x: G.inX, y: cy - 2, "text-anchor": "middle",
+      "font-size": 30, "font-weight": 800, fill: "var(--off)"
+    }, grupo);
+
+    var simNao = el("text", {
+      x: G.inX, y: cy + 23, "text-anchor": "middle",
+      "font-size": 13, "font-weight": 600, fill: "var(--off)"
+    }, grupo);
+
+    function alternar() {
+      estado.entradas[i].ligada = !estado.entradas[i].ligada;
+      grupo.setAttribute("aria-pressed", estado.entradas[i].ligada ? "true" : "false");
+      recalcular();
+    }
+
+    grupo.addEventListener("click", alternar);
+    grupo.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+        ev.preventDefault();
+        alternar();
+      }
+    });
+
+    refs.entradas.push({
+      linha: linha, pill: pill, pesoTxt: pesoTxt,
+      anel: anel, valor: valor, simNao: simNao, grupo: grupo
+    });
+  });
+
+  /* ---------- Bias: entra no neurônio como qualquer sinal ---------- */
+
+  var ab = aresta(G.biasX, G.biasY, G.biasR, G.nX, G.nY, G.nR);
+  refs.biasLinha = el("line", {
+    x1: ab.x1, y1: ab.y1, x2: ab.x2, y2: ab.y2,
+    stroke: "var(--warn)", "stroke-width": 3,
+    "stroke-dasharray": "7 6", "stroke-linecap": "round"
+  }, gArestas);
+
+  var bpulsos = [];
+  for (var q = 0; q < 2; q++) {
+    bpulsos.push(el("circle", { r: 4.5, fill: "var(--warn)", opacity: 0 }, gPulsos));
+  }
+  refs.biasPulsos = { a: ab, circulos: bpulsos, fase: 0.5 };
+
+  el("text", {
+    x: G.labelX, y: G.biasY - 6, "text-anchor": "end",
+    "font-size": 15.5, fill: "var(--warn)", "font-weight": 600
+  }, gNos).textContent = "Bias";
+
+  el("text", {
+    x: G.labelX, y: G.biasY + 13, "text-anchor": "end",
+    "font-size": 12.5, fill: "var(--txt-dim)"
+  }, gNos).textContent = "tendência inicial";
+
+  el("circle", {
+    cx: G.biasX, cy: G.biasY, r: G.biasR,
+    fill: "#2a2210", stroke: "var(--warn)", "stroke-width": 3
+  }, gNos);
+
+  refs.biasValor = el("text", {
+    x: G.biasX, y: G.biasY + 7, "text-anchor": "middle",
+    "font-size": 19, "font-weight": 800, fill: "var(--warn)"
+  }, gNos);
+
+  /* ---------- Corpo do neurônio: anel de carga + Soma Ponderada ---------- */
+
+  var gN = el("g", {}, gNos);
+
+  refs.neuronioGlow = el("circle", {
+    cx: G.nX, cy: G.nY, r: G.nR - 6,
+    fill: "var(--panel-2)", stroke: "none", opacity: 0
+  }, gN);
+
+  el("circle", {
+    cx: G.nX, cy: G.nY, r: G.nR,
+    fill: "var(--panel-2)", stroke: "var(--line)", "stroke-width": 2
+  }, gN);
+
+  /* trilho e arco: o quanto a soma caminhou até o limiar */
+  var rAro = G.nR - 11;
+  refs.circunf = 2 * Math.PI * rAro;
+
+  el("circle", {
+    cx: G.nX, cy: G.nY, r: rAro,
+    fill: "none", stroke: "#0d1220", "stroke-width": 11
+  }, gN);
+
+  refs.arco = el("circle", {
+    cx: G.nX, cy: G.nY, r: rAro,
+    fill: "none", stroke: "var(--accent)", "stroke-width": 11,
+    "stroke-linecap": "round",
+    "stroke-dasharray": "0 " + refs.circunf,
+    transform: "rotate(-90 " + G.nX + " " + G.nY + ")"
+  }, gN);
+
+  el("text", {
+    x: G.nX, y: G.nY - 44, "text-anchor": "middle",
+    "font-size": 11, fill: "var(--txt-dim)"
+  }, gN).textContent = "Σ (entrada × peso) + bias";
+
+  refs.somaTxt = el("text", {
+    x: G.nX, y: G.nY + 16, "text-anchor": "middle",
+    "font-size": 46, "font-weight": 800, fill: "#fff"
+  }, gN);
+
+  el("text", {
+    x: G.nX, y: G.nY + 42, "text-anchor": "middle",
+    "font-size": 12.5, fill: "var(--txt-dim)"
+  }, gN).textContent = "Soma Ponderada";
+
+  /* ---------- Função de ativação: o degrau e onde a soma caiu ---------- */
+
+  var fcx = G.fx + G.fw / 2;
+
+  var al = aresta(G.nX, G.nY, G.nR, G.fx - 6, G.fy + G.fh / 2, 0);
+  refs.setaFn = el("line", {
+    x1: al.x1, y1: al.y1, x2: al.x2, y2: al.y2,
+    stroke: "var(--line)", "stroke-width": 3, "stroke-linecap": "round"
+  }, gArestas);
+
+  el("rect", {
+    x: G.fx, y: G.fy, width: G.fw, height: G.fh, rx: 12,
+    fill: "#0d1220", stroke: "var(--line)", "stroke-width": 2
+  }, gNos);
+
+  el("text", {
+    x: fcx, y: G.fy - 12, "text-anchor": "middle",
+    "font-size": 13.5, fill: "var(--txt-dim)", "font-weight": 600
+  }, gNos).textContent = "função de ativação";
+
+  /* eixos do gráfico do degrau */
+  var pad = 20, R = 8;                             // eixo x: -8 .. +8
+  var gx0 = G.fx + pad, gx1 = G.fx + G.fw - pad;
+  var gy0 = G.fy + G.fh - pad, gy1 = G.fy + pad;   // y: 0 embaixo, 1 em cima
+  function px(v) { return gx0 + ((Math.max(-R, Math.min(R, v)) + R) / (2 * R)) * (gx1 - gx0); }
+  refs.px = px; refs.gy0 = gy0; refs.gy1 = gy1;
+
+  el("line", { x1: gx0, y1: gy0, x2: gx1, y2: gy0, stroke: "var(--line)", "stroke-width": 1.5 }, gNos);
+
+  /* o degrau: 0 até o limiar, salta para 1 a partir dele */
+  el("polyline", {
+    points: [gx0, gy0, px(LIMIAR), gy0, px(LIMIAR), gy1, gx1, gy1].join(" "),
+    fill: "none", stroke: "var(--off)", "stroke-width": 2.5
+  }, gNos);
+
+  el("line", {
+    x1: px(LIMIAR), y1: gy1 - 6, x2: px(LIMIAR), y2: gy0 + 6,
+    stroke: "var(--txt-dim)", "stroke-width": 1, "stroke-dasharray": "3 3"
+  }, gNos);
+
+  el("text", { x: px(LIMIAR), y: gy0 + 15, "text-anchor": "middle", "font-size": 11, fill: "var(--txt-dim)" },
+     gNos).textContent = "limiar " + LIMIAR;
+  el("text", { x: gx0 - 7, y: gy1 + 4, "text-anchor": "end", "font-size": 11, fill: "var(--txt-dim)" },
+     gNos).textContent = "1";
+  el("text", { x: gx0 - 7, y: gy0 + 4, "text-anchor": "end", "font-size": 11, fill: "var(--txt-dim)" },
+     gNos).textContent = "0";
+
+  /* a bolinha: onde a Soma Ponderada caiu no degrau */
+  refs.ponto = el("circle", { r: 6.5, fill: "var(--off)", stroke: "#0d1220", "stroke-width": 2 }, gNos);
+
+  /* ---------- Saída ---------- */
+
+  var ao = aresta(fcx, G.fy + G.fh / 2, G.fw / 2 + 6, G.outX, G.outY, G.outR);
+  refs.setaOut = el("line", {
+    x1: ao.x1, y1: ao.y1, x2: ao.x2, y2: ao.y2,
+    stroke: "var(--line)", "stroke-width": 3, "stroke-linecap": "round"
+  }, gArestas);
+
+  refs.outPulsos = { a: ao, circulos: [] };
+  for (var o = 0; o < 2; o++) {
+    refs.outPulsos.circulos.push(el("circle", { r: 5, fill: "var(--on)", opacity: 0 }, gPulsos));
+  }
+
+  var gOut = el("g", {}, gNos);
+
+  refs.outGlow = el("circle", {
+    cx: G.outX, cy: G.outY, r: G.outR - 4, fill: "var(--on-soft)", opacity: 0
+  }, gOut);
+
+  refs.outAnel = el("circle", {
+    cx: G.outX, cy: G.outY, r: G.outR,
+    fill: "var(--off-soft)", stroke: "var(--off)", "stroke-width": 3
+  }, gOut);
+
+  refs.outEmoji = el("text", {
+    x: G.outX, y: G.outY + 6, "text-anchor": "middle", "font-size": 42
+  }, gOut);
+
+  refs.outBit = el("text", {
+    x: G.outX, y: G.outY + G.outR + 22, "text-anchor": "middle",
+    "font-size": 12.5, "font-weight": 700, "letter-spacing": "0.5",
+    fill: "var(--off)"
+  }, gOut);
+
+  el("text", {
+    x: G.outX, y: G.outY - G.outR - 14, "text-anchor": "middle",
+    "font-size": 13.5, fill: "var(--txt-dim)", "font-weight": 600
+  }, gNos).textContent = "saída";
+
+  refs.outMsg = el("text", {
+    x: G.outX, y: G.outY + G.outR + 46, "text-anchor": "middle",
+    "font-size": 17, "font-weight": 800, fill: "var(--off)"
+  }, gNos);
+
+  /* a pergunta do cenário, no alto */
+  el("text", {
+    x: 520, y: 34, "text-anchor": "middle",
+    "font-size": 17, "font-weight": 700, fill: "var(--txt-dim)"
+  }, gNos).textContent = cenarioAtual.pergunta;
+}
+
+/* ================= Controles (FR-3, FR-4) ================= */
+
+function montarControles() {
+  var box = document.getElementById("controls");
+  box.innerHTML = "";
+
+  cenarioAtual.entradas.forEach(function (ent, i) {
+    var card = document.createElement("div");
+    card.className = "ctl";
+
+    var pid = "peso-" + i;
+    var head = document.createElement("div");
+    head.className = "ctl-head";
+    head.innerHTML = '<label for="' + pid + '">Importância de <b>' + ent.nome + "</b></label>";
+
+    var val = document.createElement("span");
+    val.className = "ctl-val";
+    val.textContent = fmt(estado.entradas[i].peso);
+    head.appendChild(val);
+
+    var sl = document.createElement("input");
+    sl.type = "range";
+    sl.id = pid;
+    sl.min = "-5"; sl.max = "5"; sl.step = "0.5";
+    sl.value = estado.entradas[i].peso;
+    sl.setAttribute("aria-label", "Importância de: " + ent.nome + " (peso)");
+
+    var ticks = document.createElement("div");
+    ticks.className = "ticks";
+    ticks.setAttribute("aria-hidden", "true");
+    ticks.innerHTML = "<span>-5</span><span>0</span><span>+5</span>";
+
+    sl.addEventListener("input", function () {
+      estado.entradas[i].peso = parseFloat(sl.value);
+      val.textContent = fmt(estado.entradas[i].peso);
+      recalcular();
+    });
+
+    card.appendChild(head);
+    card.appendChild(sl);
+    card.appendChild(ticks);
+    box.appendChild(card);
+  });
+
+  /* bias */
+  var card = document.createElement("div");
+  card.className = "ctl bias";
+
+  var head = document.createElement("div");
+  head.className = "ctl-head";
+  head.innerHTML = '<label for="bias"><b>Bias</b> (tendência inicial)</label>';
+
+  var val = document.createElement("span");
+  val.className = "ctl-val";
+  val.textContent = fmt(estado.bias);
+  head.appendChild(val);
+
+  var sl = document.createElement("input");
+  sl.type = "range";
+  sl.id = "bias";
+  sl.min = "-10"; sl.max = "10"; sl.step = "0.5";
+  sl.value = estado.bias;
+  sl.setAttribute("aria-label", "Bias (tendência inicial)");
+
+  var ticks = document.createElement("div");
+  ticks.className = "ticks";
+  ticks.setAttribute("aria-hidden", "true");
+  ticks.innerHTML = "<span>-10</span><span>0</span><span>+10</span>";
+
+  sl.addEventListener("input", function () {
+    estado.bias = parseFloat(sl.value);
+    val.textContent = fmt(estado.bias);
+    recalcular();
+  });
+
+  card.appendChild(head);
+  card.appendChild(sl);
+  card.appendChild(ticks);
+  box.appendChild(card);
+}
+
+/* ================= Cenários ================= */
+
+function montarAbas() {
+  var box = document.getElementById("scenarios");
+  CENARIOS.forEach(function (cen) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = cen.aba;
+    b.addEventListener("click", function () {
+      if (cen.id === cenarioAtual.id) return;
+      cenarioAtual = cen;
+      resetarCenario();
+      marcarAbaAtiva();
+      construirDiagrama();
+      montarControles();
+      recalcular();
+    });
+    botoesAba.push({ id: cen.id, el: b });
+    box.appendChild(b);
+  });
+  marcarAbaAtiva();
+}
+
+function marcarAbaAtiva() {
+  botoesAba.forEach(function (b) {
+    b.el.setAttribute("aria-pressed", b.id === cenarioAtual.id ? "true" : "false");
+  });
+}
+
+/* Valores padrão do cenário atual (FR-1, FR-7) */
+function resetarCenario() {
+  estado = {
+    bias: cenarioAtual.bias,
+    entradas: cenarioAtual.entradas.map(function (e) {
+      return { ligada: false, peso: e.peso };  // tudo começa em "Não"
+    })
+  };
+}
+
+/* ================= Cálculo e desenho ================= */
+
+var ativadoAtual = false;
+
+function recalcular() {
+  var soma = estado.bias;
+  var contribs = [];
+
+  estado.entradas.forEach(function (e, i) {
+    var x = e.ligada ? 1 : 0;
+    var c = x * e.peso;
+    soma += c;
+    contribs.push({ nome: cenarioAtual.entradas[i].nome, x: x, peso: e.peso, c: c });
+  });
+
+  soma = Math.round(soma * 100) / 100;
+  var ativado = soma >= LIMIAR;
+  ativadoAtual = ativado;
+
+  pintarDiagrama(contribs, soma, ativado);
+  pintarConta(contribs, soma, ativado);
+  anunciar(soma, ativado);
+}
+
+function pintarDiagrama(contribs, soma, ativado) {
+  var corFogo = ativado ? "var(--on)" : "var(--accent)";
+
+  /* entradas e suas conexões */
+  estado.entradas.forEach(function (e, i) {
+    var r = refs.entradas[i];
+    var corPeso = e.peso < 0 ? "var(--neg)" : "var(--accent)";
+
+    r.pesoTxt.textContent = (e.peso > 0 ? "+" : "") + fmt(e.peso);
+    r.pesoTxt.setAttribute("fill", e.ligada ? corPeso : "var(--txt-dim)");
+    r.pill.setAttribute("stroke", e.ligada ? corPeso : "var(--line)");
+
+    /* conexão mais grossa = peso mais importante */
+    var esp = 2 + Math.min(Math.abs(e.peso), 5) * 1.5;
+    r.linha.setAttribute("stroke-width", e.ligada ? esp : 2.5);
+    r.linha.setAttribute("stroke", e.ligada ? corPeso : "var(--line)");
+    r.linha.setAttribute("opacity", e.ligada ? 1 : 0.45);
+
+    r.anel.setAttribute("stroke", e.ligada ? "var(--on)" : "var(--off)");
+    r.anel.setAttribute("fill", e.ligada ? "var(--on-soft)" : "var(--off-soft)");
+    r.anel.setAttribute("filter", e.ligada ? "url(#glowOn)" : "none");
+
+    r.valor.textContent = e.ligada ? "1" : "0";
+    r.valor.setAttribute("fill", e.ligada ? "#6ee7a0" : "var(--off)");
+
+    r.simNao.textContent = e.ligada ? "SIM" : "NÃO";
+    r.simNao.setAttribute("fill", e.ligada ? "#6ee7a0" : "var(--off)");
+  });
+
+  /* bias */
+  refs.biasValor.textContent = (estado.bias > 0 ? "+" : "") + fmt(estado.bias);
+  refs.biasLinha.setAttribute("opacity", estado.bias === 0 ? 0.3 : 1);
+
+  /* corpo do neurônio */
+  refs.somaTxt.textContent = fmt(soma);
+  refs.somaTxt.setAttribute("fill", ativado ? "#6ee7a0" : "#fff");
+
+  var prog = Math.max(0, Math.min(1, soma / LIMIAR));
+  refs.arco.setAttribute("stroke-dasharray", (prog * refs.circunf) + " " + refs.circunf);
+  refs.arco.setAttribute("stroke", corFogo);
+
+  refs.neuronioGlow.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+  if (semAnimacao) refs.neuronioGlow.setAttribute("opacity", ativado ? 1 : 0);
+
+  /* ponto no degrau da função de ativação */
+  refs.ponto.setAttribute("cx", refs.px(soma));
+  refs.ponto.setAttribute("cy", ativado ? refs.gy1 : refs.gy0);
+  refs.ponto.setAttribute("fill", ativado ? "var(--on)" : "var(--off)");
+  refs.ponto.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+
+  refs.setaFn.setAttribute("stroke", ativado ? "var(--on)" : "var(--line)");
+
+  /* saída */
+  var txt = ativado ? cenarioAtual.ativado : cenarioAtual.naoAtivado;
+  refs.setaOut.setAttribute("stroke", ativado ? "var(--on)" : "var(--line)");
+  refs.setaOut.setAttribute("opacity", ativado ? 1 : 0.45);
+
+  refs.outAnel.setAttribute("stroke", ativado ? "var(--on)" : "var(--off)");
+  refs.outAnel.setAttribute("stroke-width", ativado ? 4 : 3);
+  refs.outAnel.setAttribute("filter", ativado ? "url(#glowOn)" : "none");
+  refs.outGlow.setAttribute("opacity", ativado ? 1 : 0);
+
+  refs.outEmoji.textContent = txt.emoji;
+  refs.outBit.textContent = ativado ? "DISPAROU · 1" : "NÃO DISPAROU · 0";
+  refs.outBit.setAttribute("fill", ativado ? "#6ee7a0" : "var(--off)");
+
+  refs.outMsg.textContent = txt.msg;
+  refs.outMsg.setAttribute("fill", ativado ? "#6ee7a0" : "var(--off)");
+
+  /* descrição textual do diagrama para leitores de tela */
+  document.getElementById("net-desc").textContent =
+    "Diagrama do neurônio. " +
+    contribs.map(function (c) {
+      return c.nome + " " + (c.x ? "ligada" : "desligada") +
+             ", peso " + fmt(c.peso) + ", contribui " + fmt(c.c);
+    }).join("; ") +
+    ". Bias " + fmt(estado.bias) +
+    ". Soma Ponderada " + fmt(soma) +
+    ". Neurônio " + (ativado ? "ativado" : "não ativado") + ".";
+}
+
+function pintarConta(contribs, soma, ativado) {
+  var partes = contribs.map(function (c) {
+    return '<span class="term">(' + c.x + " × " + fmt(c.peso) + ")</span>";
+  });
+  document.getElementById("formula").innerHTML =
+    partes.join(" + ") +
+    ' + <span class="bias">(' + fmt(estado.bias) + ")</span>" +
+    ' = <span class="sum">' + fmt(soma) + "</span>";
+
+  var cor = ativado ? "var(--on)" : "var(--off)";
+  document.getElementById("verdict").innerHTML =
+    '<span style="color:' + cor + '">' + fmt(soma) + " " + (ativado ? "≥" : "<") +
+    " " + LIMIAR + " → " + (ativado ? "ATIVADO" : "NÃO ATIVADO") + "</span>";
+}
+
+function anunciar(soma, ativado) {
+  if (ativado === ultimoAtivado) return;
+  ultimoAtivado = ativado;
+  var txt = ativado ? cenarioAtual.ativado : cenarioAtual.naoAtivado;
+  document.getElementById("sr-status").textContent =
+    txt.msg + " — neurônio " + (ativado ? "ativado" : "não ativado") +
+    ". Soma Ponderada " + fmt(soma) + ".";
+}
+
+/* ================= Animação dos sinais ================= */
+
+function animar(ts) {
+  var t = (ts || 0) / 1000;
+
+  /* pulsos das entradas ligadas */
+  refs.pulsos.forEach(function (p, i) {
+    var ligada = estado.entradas[i].ligada;
+    var cor = estado.entradas[i].peso < 0 ? "#fca5a5" : "#dbeafe";
+    p.circulos.forEach(function (c, k) {
+      if (!ligada) { c.setAttribute("opacity", 0); return; }
+      var f = ((t * 0.55 + p.fase + k / p.circulos.length) % 1);
+      c.setAttribute("cx", p.a.x1 + (p.a.x2 - p.a.x1) * f);
+      c.setAttribute("cy", p.a.y1 + (p.a.y2 - p.a.y1) * f);
+      c.setAttribute("fill", cor);
+      c.setAttribute("opacity", 0.95 * Math.sin(Math.PI * f));
+    });
+  });
+
+  /* pulsos do bias */
+  refs.biasPulsos.circulos.forEach(function (c, k) {
+    if (estado.bias === 0) { c.setAttribute("opacity", 0); return; }
+    var p = refs.biasPulsos;
+    var f = ((t * 0.45 + p.fase + k / p.circulos.length) % 1);
+    c.setAttribute("cx", p.a.x1 + (p.a.x2 - p.a.x1) * f);
+    c.setAttribute("cy", p.a.y1 + (p.a.y2 - p.a.y1) * f);
+    c.setAttribute("opacity", 0.9 * Math.sin(Math.PI * f));
+  });
+
+  /* pulsos da saída: só quando o neurônio dispara */
+  refs.outPulsos.circulos.forEach(function (c, k) {
+    if (!ativadoAtual) { c.setAttribute("opacity", 0); return; }
+    var p = refs.outPulsos;
+    var f = ((t * 0.8 + k / p.circulos.length) % 1);
+    c.setAttribute("cx", p.a.x1 + (p.a.x2 - p.a.x1) * f);
+    c.setAttribute("cy", p.a.y1 + (p.a.y2 - p.a.y1) * f);
+    c.setAttribute("opacity", 0.95 * Math.sin(Math.PI * f));
+  });
+
+  /* pulsação suave do neurônio quando ativado */
+  refs.neuronioGlow.setAttribute(
+    "opacity", ativadoAtual ? (0.55 + 0.45 * Math.abs(Math.sin(t * 1.9))) : 0);
+
+  requestAnimationFrame(animar);
+}
+
+/* ================= Arranque ================= */
+
+document.getElementById("reset").addEventListener("click", function () {
+  resetarCenario();
+  construirDiagrama();
+  montarControles();
+  recalcular();
+});
+
+resetarCenario();
+montarAbas();
+construirDiagrama();
+montarControles();
+recalcular();
+
+if (!semAnimacao) {
+  requestAnimationFrame(animar);
+} else {
+  /* sem animação: um sinal estático no meio de cada conexão ligada */
+  refs.pulsos.forEach(function (p, i) {
+    p.circulos.forEach(function (c, k) {
+      if (!estado.entradas[i].ligada || k > 0) { c.setAttribute("opacity", 0); return; }
+      c.setAttribute("cx", (p.a.x1 + p.a.x2) / 2);
+      c.setAttribute("cy", (p.a.y1 + p.a.y2) / 2);
+      c.setAttribute("opacity", 0.9);
+    });
+  });
+}
+</script>
+
+</body>
+</html>

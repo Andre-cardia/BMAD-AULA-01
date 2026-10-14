@@ -1,0 +1,5 @@
+# Cache gerado pelo BMad (render_skill.py recria a cada execução)
+_bmad/render/
+
+# macOS
+.DS_Store
